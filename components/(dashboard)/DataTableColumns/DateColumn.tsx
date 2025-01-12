@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getNormalDate } from "@/lib/getNormalDate";
 import React from "react";
 const getPastDays = (isoString: string): number => {
