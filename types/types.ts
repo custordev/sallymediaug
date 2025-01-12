@@ -353,3 +353,9 @@ export interface EmailTemplateProps {
   subject: string;
   message: string;
 }
+export interface serviceProps {
+  title: string;
+  icon: React.ComponentType; // For React components, like icons
+  description: string;
+  image: string; // Path to the image
+}

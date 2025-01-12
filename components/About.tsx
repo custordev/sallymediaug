@@ -23,7 +23,10 @@ const stats = [
 
 const About = () => {
   return (
-    <section className="py-16 bg-gradient-to-b from-amber-50 to-white">
+    <section
+      id="about"
+      className="py-16 bg-gradient-to-b from-amber-50 to-white"
+    >
       <div className="container mx-auto px-4">
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row items-center gap-12 mb-16">

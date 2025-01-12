@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-export default function HeroSection() {
+export default function HeroSection({ slug }: { slug: string }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function HeroSection() {
           }`}
         >
           <h1 className="text-4xl md:text-7xl font-light tracking-wider transition-all duration-500">
-            DENIS + PROSSY
+            {slug}
           </h1>
           <p className="md:text-xl text-md tracking-[0.2em] transition-all duration-500">
             NOVEMBER 23RD 2024
