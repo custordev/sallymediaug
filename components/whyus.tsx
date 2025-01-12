@@ -1,7 +1,15 @@
 import React from "react";
 import { FiCamera, FiHeart, FiClock, FiAward } from "react-icons/fi";
 
-const Feature = ({ icon, title, description }) => (
+const Feature = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) => (
   <div className="flex flex-col items-start bg-white bg-opacity-80 p-6 shadow-lg rounded-xl">
     <div className="bg-amber-400 rounded-full p-4 mb-4">{icon}</div>
     <h3 className="text-lg text-amber-800 font-semibold mb-2">{title}</h3>

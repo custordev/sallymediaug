@@ -11,9 +11,16 @@ import {
   Users,
   Sparkles,
 } from "lucide-react";
-import { serviceProps } from "@/types/types";
 
-const services = [
+// Define the serviceProps type
+type serviceProps = {
+  title: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // Icon as a React component
+  description: string;
+  image: string;
+};
+
+const services: serviceProps[] = [
   {
     title: "Weddings",
     icon: Heart,
@@ -75,13 +82,13 @@ const ServiceCard = ({
         <Image
           src={service.image}
           alt={service.title}
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: "cover" }}
           className="transition-transform duration-300 hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-4 left-4 text-white">
-          <service.icon className="w-6 h-6 mb-2" />
+          {React.createElement(service.icon, { className: "w-6 h-6 mb-2" })}
           <h3 className="text-xl font-semibold">{service.title}</h3>
         </div>
       </div>
