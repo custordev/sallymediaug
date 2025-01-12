@@ -1,7 +1,5 @@
 "use server";
 
-import axios from "axios";
-
 import { UserProps } from "@/types/types";
 import bcrypt from "bcrypt";
 import db from "@/prisma/db";

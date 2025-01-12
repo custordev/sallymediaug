@@ -373,3 +373,9 @@ export type LoginProps = {
   email: string;
   password: string;
 };
+export type CategoryProps = {
+  title: string;
+  slug: string;
+  imageUrl: string;
+  description: string;
+};

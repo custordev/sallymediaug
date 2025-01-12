@@ -2,6 +2,7 @@
 
 import db from "@/prisma/db";
 import { CategoryProps } from "@/types/types";
+
 import { revalidatePath } from "next/cache";
 
 export async function createCategory(data: CategoryProps) {
