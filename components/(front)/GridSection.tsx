@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { categories } from "@/types/types";
-import { Header } from "./Header";
+import { Header } from "../(global)/Header";
 import { CategoryNav } from "./categoryNav";
 import { PhotoGrid } from "./photoGrid";
 import { FullscreenView } from "./fullScreenView";

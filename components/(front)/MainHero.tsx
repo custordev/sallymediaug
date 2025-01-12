@@ -15,8 +15,8 @@ export function Hero() {
         />
         <div className="absolute inset-0 bg-black/40" />
       </div>
-      <div className="relative h-full flex items-center justify-center text-center">
-        <div className="max-w-3xl px-4">
+      <div className="relative   h-full flex items-center justify-center text-center">
+        <div className="max-w-3xl px-4 mt-48">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Capturing Life&apos;s Beautiful Moments
           </h1>

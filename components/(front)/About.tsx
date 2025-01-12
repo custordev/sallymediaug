@@ -3,7 +3,7 @@
 import React from "react";
 
 import { Camera, Clock, Award, Heart, Users } from "lucide-react";
-import { Carousel } from "./ui/carousel";
+import { Carousel } from "../ui/carousel";
 
 const images = [
   { src: "/denis-prossy/highlights/N77A8605.jpg" },
