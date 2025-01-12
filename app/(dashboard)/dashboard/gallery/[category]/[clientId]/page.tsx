@@ -1,15 +1,17 @@
 import ClientGallery from "@/components/(dashboard)/clientGallery";
 import React from "react";
 
-export default function ClientPage({
+export default async function ClientPage({
   params,
 }: {
-  params: { category: string; clientId: string };
+  params: Promise<{ category: string; clientId: string }>;
 }) {
+  const category = (await params).category;
+  const clientId = (await params).clientId;
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
-        <ClientGallery category={params.category} clientId={params.clientId} />
+        <ClientGallery category={category} clientId={clientId} />
       </main>
     </div>
   );

@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import CategoryGallery from "@/components/(dashboard)/galleryCategory";
 import React from "react";
 
-export default function CategoryPage({
+export default async function CategoryPage({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
+  const category = (await params).category;
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
-        <CategoryGallery category={params.category} />
+        <CategoryGallery category={category} />
       </main>
     </div>
   );
