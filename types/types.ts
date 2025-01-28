@@ -14,6 +14,13 @@ export interface ExtendedClient {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Client {
+  title: string;
+  eventDate: string;
+  description: string;
+  imageUrl: string;
+}
 export interface Photo {
   src: string;
 }
