@@ -15,6 +15,7 @@ export default async function DashboardLayout({
   if (!session) {
     redirect("/login");
   }
+
   return (
     <div className="min-h-screen bg-amber-50">
       <Sidebar />
