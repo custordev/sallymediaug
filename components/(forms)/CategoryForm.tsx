@@ -1,6 +1,5 @@
 "use client";
 
-
 import {
   Card,
   CardContent,
@@ -26,7 +25,6 @@ import FormFooter from "./FormFooter";
 import ImageInput from "../(formInputs)/ImageInput";
 import FormHeader from "./FormHeader";
 import TextArea from "../(formInputs)/TextAreaInput";
-
 
 export type SelectOptionProps = {
   label: string;
@@ -115,9 +113,7 @@ export default function CategoryForm({
           <Card>
             <CardHeader>
               <CardTitle>Category Title</CardTitle>
-              <CardDescription>
-                Lipsum dolor sit amet, consectetur adipiscing elit
-              </CardDescription>
+              <CardDescription>Fill in the Required</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-6">

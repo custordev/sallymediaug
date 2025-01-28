@@ -3,14 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {  LayoutDashboard, Calendar, Users, ImageIcon, LineChart, Settings, LogOut, HelpCircle } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Calendar,
+  Users,
+  ImageIcon,
+  LineChart,
+  Settings,
+  LogOut,
+  HelpCircle,
+} from "lucide-react";
 import Logo from "@/components/(global)/Logo";
 
 const sidebarLinks = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { name: "Bookings", icon: Calendar, href: "/dashboard/bookings" },
   { name: "Clients", icon: Users, href: "/dashboard/clients" },
-  { name: "Gallery", icon: ImageIcon, href: "/dashboard/gallery" },
+  { name: "Categories", icon: ImageIcon, href: "/dashboard/categories" },
   { name: "Analytics", icon: LineChart, href: "/dashboard/analytics" },
   { name: "Settings", icon: Settings, href: "/dashboard/settings" },
 ];
@@ -21,7 +30,7 @@ export function Sidebar() {
   return (
     <div className="hidden md:flex h-screen w-64 flex-col fixed left-0 top-0 bg-white border-r border-amber-100">
       <div className="p-4 border-b border-amber-100">
-       <Logo/>
+        <Logo />
       </div>
 
       <nav className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -65,4 +74,3 @@ export function Sidebar() {
     </div>
   );
 }
-

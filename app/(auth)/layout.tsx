@@ -9,6 +9,7 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
       <NavbarV1 />
       <div className="relative isolate px-6 pt-14 lg:px-8">
         {children}
+
         <Footer />
       </div>
     </div>

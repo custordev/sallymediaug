@@ -5,12 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Menu, X, Camera, Bell } from 'lucide-react';
+import { Menu, X, Camera, Bell } from "lucide-react";
 
 const navLinks = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Bookings", href: "/dashboard/bookings" },
-  { name: "Gallery", href: "/dashboard/gallery" },
+  { name: "Categories", href: "/dashboard/categories" },
   { name: "Clients", href: "/dashboard/clients" },
 ];
 
@@ -95,4 +95,3 @@ export function Navbar() {
     </nav>
   );
 }
-

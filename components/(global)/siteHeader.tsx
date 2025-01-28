@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, UserCircle } from "lucide-react"; // Added UserCircle icon
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -18,8 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "./Logo";
 import Image from "next/image";
+import { Category } from "@prisma/client";
+import { useSession } from "next-auth/react"; // Import useSession for auth
 
-const menuItems = [
+// Base menu items without gallery children
+const baseMenuItems = [
   {
     title: "Home",
     href: "/",
@@ -27,38 +30,7 @@ const menuItems = [
   {
     title: "Gallery",
     href: "/gallery",
-    children: [
-      {
-        title: "Weddings",
-        description: "Capture your special moments.",
-        image: "/denis-prossy/highlights/N77A8602.jpg",
-        href: "/gallery/weddings",
-      },
-      {
-        title: "Kukyala",
-        description: "Beautiful memories from Kukyala events.",
-        image: "/denis-prossy/highlights/N77A8605.jpg",
-        href: "/gallery/kukyala",
-      },
-      {
-        title: "Giveaways",
-        description: "Cherished moments from giveaways.",
-        image: "/denis-prossy/highlights/N77A8605.jpg",
-        href: "/gallery/giveaways",
-      },
-      {
-        title: "Birthdays",
-        description: "Celebrate your birthday in style.",
-        image: "/denis-prossy/highlights/N77A8605.jpg",
-        href: "/gallery/birthdays",
-      },
-      {
-        title: "Graduations",
-        description: "Commemorate your achievements.",
-        image: "/denis-prossy/highlights/N77A8605.jpg",
-        href: "/gallery/graduations",
-      },
-    ],
+    hasChildren: true,
   },
   {
     title: "About",
@@ -74,14 +46,32 @@ const menuItems = [
   },
 ];
 
-export default function SiteHeader() {
+export default function SiteHeader({
+  allCategories,
+}: {
+  allCategories: Category[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
+
+  // Process categories to match the required format and limit to 6
+  const processedCategories = allCategories.slice(0, 6).map((category) => ({
+    title: category.title,
+    description:
+      category.description || `View our ${category.title} collection`,
+    image: category.imageUrl || "/placeholder-image.jpg",
+    href: `/gallery`,
+  }));
+
+  // Combine base menu items with processed categories
+  const menuItems = baseMenuItems.map((item) =>
+    item.hasChildren ? { ...item, children: processedCategories } : item
+  );
 
   const handleNavigation = (href: string) => {
     if (href.startsWith("#")) {
-      // Handle smooth scroll for section navigation on home page
       if (pathname !== "/") {
         router.push("/");
         setTimeout(() => {
@@ -98,6 +88,31 @@ export default function SiteHeader() {
     setIsSheetOpen(false);
   };
 
+  // Auth button component
+  const AuthButton = () => {
+    if (session) {
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={() => router.push("/dashboard")}
+        >
+          <UserCircle className="h-5 w-5" />
+          <span className="hidden md:inline">{session.user?.name}</span>
+        </Button>
+      );
+    }
+    return (
+      <Button
+        className="bg-amber-600 hover:bg-amber-700 text-white border-none"
+        size="sm"
+      >
+        <Link href="/login">Login</Link>
+      </Button>
+    );
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-amber-50 to-white border-b border-amber-100">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -105,12 +120,13 @@ export default function SiteHeader() {
           <Logo />
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-4">
           <NavigationMenu>
             <NavigationMenuList>
               {menuItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
-                  {item.children ? (
+                  {"children" in item ? (
                     <>
                       <NavigationMenuTrigger className="text-gray-700 dark:text-gray-100 hover:text-amber-600">
                         {item.title}
@@ -121,34 +137,35 @@ export default function SiteHeader() {
                             {item.title}
                           </h3>
                           <ul className="grid gap-1 md:grid-cols-2">
-                            {item.children.map((child) => (
-                              <ListItem
-                                key={child.title}
-                                title={child.title}
-                                href={child.href}
-                                onClick={() => handleNavigation(child.href)}
-                              >
-                                <div className="flex items-center gap-6">
-                                  <div className="border border-amber-100 p-1 rounded-md">
-                                    <Image
-                                      src={child.image}
-                                      width={1080}
-                                      height={1080}
-                                      className="w-12 h-12 rounded-md object-cover"
-                                      alt={child.title}
-                                    />
-                                  </div>
-                                  <div>
-                                    <div className="font-medium text-gray-700">
-                                      {child.title}
+                            {"children" in item &&
+                              item.children.map((child) => (
+                                <ListItem
+                                  key={child.title}
+                                  title={child.title}
+                                  href={child.href}
+                                  onClick={() => handleNavigation(child.href)}
+                                >
+                                  <div className="flex items-center gap-6">
+                                    <div className="border border-amber-100 p-1 rounded-md">
+                                      <Image
+                                        src={child.image}
+                                        width={1080}
+                                        height={1080}
+                                        className="w-12 h-12 rounded-md object-cover"
+                                        alt={child.title}
+                                      />
                                     </div>
-                                    <p className="text-sm text-gray-500">
-                                      {child.description}
-                                    </p>
+                                    <div>
+                                      <div className="font-medium text-gray-700">
+                                        {child.title}
+                                      </div>
+                                      <p className="text-sm text-gray-500">
+                                        {child.description}
+                                      </p>
+                                    </div>
                                   </div>
-                                </div>
-                              </ListItem>
-                            ))}
+                                </ListItem>
+                              ))}
                           </ul>
                         </div>
                       </NavigationMenuContent>
@@ -176,6 +193,7 @@ export default function SiteHeader() {
           </NavigationMenu>
         </nav>
 
+        {/* Desktop Actions */}
         <div className="hidden lg:flex items-center space-x-4">
           <Button
             variant="outline"
@@ -197,21 +215,12 @@ export default function SiteHeader() {
               Youtube
             </Link>
           </Button>
-          <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white border-none"
-            size="sm"
-          >
-            <Link href="/login">Login</Link>
-          </Button>
+          <AuthButton />
         </div>
 
+        {/* Mobile Navigation */}
         <div className="flex lg:hidden items-center space-x-3">
-          <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white border-none"
-            size="sm"
-          >
-            <Link href="/login">Login</Link>
-          </Button>
+          <AuthButton />
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button
@@ -227,13 +236,14 @@ export default function SiteHeader() {
               side="right"
               className="bg-gradient-to-b from-amber-50 to-white border-l border-amber-100 overflow-y-auto"
             >
+              {/* Mobile Menu Content */}
               <nav className="flex flex-col space-y-6 mt-6">
                 {menuItems.map((item) => (
                   <div
                     key={item.title}
                     className="border-b border-amber-100 pb-4"
                   >
-                    {!item.children ? (
+                    {!item.hasChildren ? (
                       <button
                         onClick={() => handleNavigation(item.href)}
                         className="text-lg font-semibold mb-3 text-amber-700 hover:text-amber-600 transition-colors"
@@ -246,31 +256,32 @@ export default function SiteHeader() {
                           {item.title}
                         </h3>
                         <ul className="space-y-3">
-                          {item.children.map((child) => (
-                            <li
-                              key={child.title}
-                              onClick={() => handleNavigation(child.href)}
-                              className="flex items-center space-x-3 cursor-pointer hover:bg-amber-50 p-2 rounded-md transition-colors"
-                            >
-                              <div className="border border-amber-100 p-1 rounded-md">
-                                <Image
-                                  src={child.image}
-                                  width={1080}
-                                  height={1080}
-                                  className="w-12 h-12 rounded-md object-cover"
-                                  alt={child.title}
-                                />
-                              </div>
-                              <div>
-                                <div className="font-medium text-gray-700">
-                                  {child.title}
+                          {"children" in item &&
+                            item.children.map((child) => (
+                              <li
+                                key={child.title}
+                                onClick={() => handleNavigation(child.href)}
+                                className="flex items-center space-x-3 cursor-pointer hover:bg-amber-50 p-2 rounded-md transition-colors"
+                              >
+                                <div className="border border-amber-100 p-1 rounded-md">
+                                  <Image
+                                    src={child.image}
+                                    width={1080}
+                                    height={1080}
+                                    className="w-12 h-12 rounded-md object-cover"
+                                    alt={child.title}
+                                  />
                                 </div>
-                                <p className="text-sm text-gray-500">
-                                  {child.description}
-                                </p>
-                              </div>
-                            </li>
-                          ))}
+                                <div>
+                                  <div className="font-medium text-gray-700">
+                                    {child.title}
+                                  </div>
+                                  <p className="text-sm text-gray-500">
+                                    {child.description}
+                                  </p>
+                                </div>
+                              </li>
+                            ))}
                         </ul>
                       </>
                     )}
@@ -284,11 +295,10 @@ export default function SiteHeader() {
     </header>
   );
 }
-
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & { onClick?: () => void }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 >(({ className, title, children, onClick, ...props }, ref) => {
   return (
     <li>

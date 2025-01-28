@@ -14,7 +14,7 @@ export default async function Page({ params }: { params: tParams }) {
   try {
     category = await getCategoryById(id);
   } catch (error) {
-    console.error("Error fetching category:", error);
+    console.log("Error fetching category:", error);
     // Handle the error gracefully (optional UI feedback or redirect)
   }
 

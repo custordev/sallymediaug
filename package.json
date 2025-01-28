@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
+    "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.2.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -40,7 +41,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.5.2",
-    "framer-motion": "^11.17.0",
+    "framer-motion": "^11.18.0",
     "lucide-react": "^0.468.0",
     "next": "15.1.2",
     "next-auth": "^4.24.11",
@@ -57,15 +58,18 @@
     "react-tailwindcss-select": "^1.8.5",
     "recharts": "^2.15.0",
     "resend": "4.0.1",
+    "sooner": "^1.1.4",
     "swiper": "^11.2.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^7.4.4",
     "xlsx": "^0.18.5",
-    "yet-another-react-lightbox": "^3.21.7"
+    "yet-another-react-lightbox": "^3.21.7",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@tailwindcss/forms": "^0.5.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

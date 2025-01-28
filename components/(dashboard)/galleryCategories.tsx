@@ -1,58 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Edit2, Trash2, FolderPlus } from "lucide-react";
+import { Edit2, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Category } from "@prisma/client";
+import { deleteCategoryById } from "@/actions/categories";
+import DeleteButton from "../(formInputs)/deleteBtn";
 
-const categories = [
-  {
-    name: "Weddings",
-    slug: "weddings",
-    image: "/denis-prossy/highlights/N77A8605.jpg",
-  },
-  {
-    name: "Birthdays",
-    slug: "birthdays",
-    image: "/denis-prossy/highlights/N77A8619.jpg",
-  },
-  {
-    name: "Corporate Events",
-    slug: "corporate-events",
-    image: "/denis-prossy/highlights/N77A8623.jpg",
-  },
-  {
-    name: "Portraits",
-    slug: "portraits",
-    image: "/denis-prossy/highlights/N77A8645.jpg",
-  },
-  {
-    name: "Graduations",
-    slug: "graduations",
-    image: "/denis-prossy/highlights/N77A8646.jpg",
-  },
-  {
-    name: "Family Sessions",
-    slug: "family-sessions",
-    image: "/denis-prossy/highlights/N77A9197.jpg",
-  },
-];
+export default function CategoriesCategories({
+  data: initialData,
+}: {
+  data: Category[];
+}) {
+  const [categories, setCategories] = useState<Category[]>(initialData);
 
-export default function GalleryCategories() {
+  const handleDeleteSuccess = (deletedId: string) => {
+    setCategories((prev) =>
+      prev.filter((category) => category.id !== deletedId)
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="flex justify-between items-center mb-12">
-        <h1 className="text-4xl font-bold text-amber-700">Photo Gallery</h1>
+        <h1 className="text-4xl font-bold text-amber-700">
+          Categories Categories
+        </h1>
+
         <Button
-          variant="default"
-          size="lg"
-          className="bg-amber-700 hover:bg-amber-800 text-white"
+          size="sm"
+          asChild
+          className="h-8 gap-1 bg-amber-700 hover:bg-amber-800 text-white"
         >
-          <FolderPlus className="mr-2 h-5 w-5" />
-          New Category
+          <Link href="/dashboard/categories/new">
+            <FolderPlus className="mr-2 h-5 w-5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              New Category
+            </span>
+          </Link>
         </Button>
       </div>
 
@@ -68,8 +57,8 @@ export default function GalleryCategories() {
               <CardContent className="p-0 relative">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
-                    src={category.image}
-                    alt={category.name}
+                    src={category.imageUrl as string}
+                    alt={category.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
                   />
@@ -77,7 +66,7 @@ export default function GalleryCategories() {
                 </div>
                 <div className="absolute bottom-4 left-4">
                   <h2 className="text-2xl font-bold text-white">
-                    {category.name}
+                    {category.title}
                   </h2>
                 </div>
 
@@ -87,24 +76,25 @@ export default function GalleryCategories() {
                     variant="secondary"
                     size="icon"
                     className="h-8 w-8 bg-white/90 hover:bg-white"
+                    asChild
                   >
-                    <Edit2 className="h-4 w-4 text-amber-700" />
+                    <Link href={`/dashboard/categories/update/${category.id}`}>
+                      <Edit2 className="h-4 w-4 text-amber-700" />
+                    </Link>
                   </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="h-8 w-8 bg-white/90 hover:bg-white"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                  </Button>
+                  <DeleteButton
+                    id={category.id}
+                    onDelete={deleteCategoryById}
+                    onSuccess={() => handleDeleteSuccess(category.id)}
+                  />
                 </div>
               </CardContent>
               <CardFooter className="p-4 bg-white">
                 <Link
-                  href={`/dashboard/gallery/${category.slug}`}
+                  href={`/dashboard/categories/${category.slug}`}
                   className="text-amber-700 hover:text-amber-800 font-medium text-sm"
                 >
-                  View Gallery →
+                  View Category →
                 </Link>
               </CardFooter>
             </Card>

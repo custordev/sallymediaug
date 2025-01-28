@@ -67,7 +67,7 @@ export async function getCategoryById(id: string) {
     console.log(error);
   }
 }
-export async function deleteCategory(id: string) {
+export async function deleteCategoryById(id: string) {
   try {
     const deletedCategory = await db.category.delete({
       where: {

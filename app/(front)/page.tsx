@@ -8,7 +8,7 @@ import FAQ from "@/components/(front)/faq";
 import Contact from "@/components/(front)/contact";
 import Services from "@/components/(front)/services";
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <div>
       <Hero />

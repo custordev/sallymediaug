@@ -1,25 +1,17 @@
-import React from "react";
-import { columns } from "./columns";
+import { getAllCategories } from "@/actions/categories";
+import GalleryCategories from "@/components/(dashboard)/galleryCategories";
 import { Category } from "@prisma/client";
 
-import { getAllCategories } from "@/actions/categories";
-import TableHeader from "@/components/(dashboard)/dashboard/Tables/TableHeader";
-import DataTable from "@/components/(dashboard)/DataTableComponents/DataTable";
+import React from "react";
 
-export default async function page() {
-  const categories: Category[] = (await getAllCategories()) || [];
+export default async function GalleryPage() {
+    const categories: Category[] = (await getAllCategories()) || [];
+  
   return (
-    <div className="p-8">
-      <TableHeader
-        title="Categories"
-        linkTitle="Add Category"
-        href="/dashboard/categories/new"
-        data={categories}
-        model="category"
-      />
-      <div className="py-8">
-        <DataTable data={categories} columns={columns} />
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
+        <GalleryCategories data={categories}/>
+      </main>
     </div>
   );
 }

@@ -9,10 +9,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 // import { createUser } from "@/actions/users";
 
-import { Button } from "../ui/button";
-import { FaGithub, FaGoogle } from "react-icons/fa";
 import { createUser } from "@/actions/users";
-import { signIn } from "next-auth/react";
 import TextInput from "../(formInputs)/TextInput";
 import PasswordInput from "../(formInputs)/PasswordInput";
 import SubmitButton from "../(formInputs)/SubmitButton";
@@ -129,25 +126,6 @@ export default function RegisterForm() {
           <div className="h-[1px] w-full bg-slate-200"></div>
           <div className="uppercase">Or</div>
           <div className="h-[1px] w-full bg-slate-200"></div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Button
-            onClick={() => signIn("google")}
-            variant={"outline"}
-            className="w-full"
-          >
-            <FaGoogle className="mr-2 w-6 h-6 text-red-500" />
-            Signup with Google
-          </Button>
-          <Button
-            onClick={() => signIn("github")}
-            variant={"outline"}
-            className="w-full"
-          >
-            <FaGithub className="mr-2 w-6 h-6 text-slate-900 dark:text-white" />
-            Signup with Github
-          </Button>
         </div>
 
         <p className="mt-6 text-left text-sm text-gray-500">

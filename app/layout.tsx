@@ -35,7 +35,7 @@ export default function RootLayout({
         <Providers>
           {/* Render Toaster only on the client */}
           <Toaster position="top-center" reverseOrder={false} />
-
+        
           {children}
         </Providers>
       </body>
