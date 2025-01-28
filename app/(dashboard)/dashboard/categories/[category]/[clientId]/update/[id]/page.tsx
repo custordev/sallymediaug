@@ -6,16 +6,18 @@ import { getAllPhotoCategories } from "@/actions/photos";
 import ClientEditForm from "@/components/(dashboard)/clientEdit";
 
 interface PageProps {
-  params: {
+  params: Promise<{
+    category: string;
     clientId: string;
-  };
+  }>;
 }
 
 export default async function ClientPage({ params }: PageProps) {
+  const { clientId } = await params;
   // Check if clientId exists for edit mode
-  if (params.clientId !== "new") {
+  if (clientId !== "new") {
     const [client, categories, photoCategories] = await Promise.all([
-      getClientById(params.clientId),
+      getClientById(clientId),
       getAllCategories(),
       getAllPhotoCategories(),
     ]);
@@ -25,7 +27,7 @@ export default async function ClientPage({ params }: PageProps) {
         <ClientEditForm
           categories={categories ?? []}
           photoCategories={photoCategories.data}
-          editingId={params.clientId}
+          editingId={clientId}
           initialData={client as any}
         />
       </div>
