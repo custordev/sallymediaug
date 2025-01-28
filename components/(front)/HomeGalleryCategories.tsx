@@ -10,16 +10,17 @@ interface GalleryProps {
   initialCategory?: string;
 }
 
-export default function Gallery({ 
-  allCategories, 
+export default function Gallery({
+  allCategories,
   clients,
-  initialCategory = "all" 
+  initialCategory = "all",
 }: GalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
 
-  const filteredClients = selectedCategory === "all"
-    ? clients.slice(0, 9) // Show first 9 clients when "all" is selected
-    : clients.filter((client) => client.categoryId === selectedCategory);
+  const filteredClients =
+    selectedCategory === "all"
+      ? clients.slice(0, 9) // Show first 9 clients when "all" is selected
+      : clients.filter((client) => client.categoryId === selectedCategory);
 
   return (
     <section className="py-20 bg-gradient-to-b from-amber-50 to-white min-h-screen">
@@ -56,7 +57,7 @@ export default function Gallery({
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6 md:gap-8">
           {filteredClients.map((client) => (
             <GalleryCard key={client.id} client={client} />
           ))}
