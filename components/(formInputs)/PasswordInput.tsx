@@ -9,10 +9,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { CircleHelp, Eye, EyeOff,  } from "lucide-react";
+import { CircleHelp, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 type TextInputProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: any;
   errors: any;
   label: string;
@@ -93,8 +92,7 @@ export default function PasswordInput({
                 message:
                   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
               },
-              // setValueAs: (value: string) =>
-              //   value === "" ? generatedPassword : value,
+             
             })}
             className={cn(
               "block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 text-sm",

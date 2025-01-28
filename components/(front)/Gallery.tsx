@@ -1,5 +1,6 @@
 "use client";
 import { categories } from "@/types/types";
+import Image from "next/image";
 import React, { useState } from "react";
 
 export function Gallery() {
@@ -34,7 +35,9 @@ export function Gallery() {
               className="aspect-square overflow-hidden cursor-pointer"
               onClick={() => setSelectedImage(photo.src)}
             >
-              <img
+              <Image
+                width={1080}
+                height={1080}
                 src={photo.src}
                 alt={`Gallery image ${index + 1}`}
                 className="w-full h-full object-cover hover:scale-105 transition duration-300"
@@ -49,7 +52,9 @@ export function Gallery() {
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <img
+          <Image
+            width={1080}
+            height={1080}
             src={selectedImage}
             alt="Selected"
             className="max-w-full max-h-[90vh] object-contain"

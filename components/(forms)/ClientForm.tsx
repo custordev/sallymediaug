@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -26,7 +25,7 @@ import NewButton from "./NewButton";
 
 export type ClientFormProps = {
   editingId?: string;
-  initialData?: Client | null;
+  initialData?: (Client & { galleryImages?: string[] }) | null;
   categories: Category[] | null;
 };
 
