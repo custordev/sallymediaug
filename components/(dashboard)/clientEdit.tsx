@@ -120,10 +120,10 @@ export default function ClientEditForm({
         eventDate: data.eventDate,
         youtubeUrl: data.youtubeUrl || undefined, // Convert null to undefined
         categoryId,
-        eventCategories: selectedPhotoCategories,
         imageUrl: imageUrl !== "/placeholder.svg" ? imageUrl : undefined,
         galleryImages,
         slug: generateSlug(data.title),
+        photos: [],
       };
 
       if (editingId) {
