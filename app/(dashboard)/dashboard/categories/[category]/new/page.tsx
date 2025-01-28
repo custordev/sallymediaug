@@ -1,25 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAllCategories } from "@/actions/categories";
 import { getClientById } from "@/actions/client";
 import { getAllPhotoCategories } from "@/actions/photos";
-
 import ClientEditForm from "@/components/(dashboard)/clientEdit";
-import { Category, PhotoCategory } from "@prisma/client";
+import { Category, PhotoCategory, Client } from "@prisma/client";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string;
     clientId: string;
-  };
+  }>;
+}
+
+// Define a type for the photo categories response
+interface PhotoCategoriesResponse {
+  success: boolean;
+  data: PhotoCategory[];
 }
 
 export default async function ClientPage({ params }: PageProps) {
+  const { clientId } = await params;
+
   // Fetch all data in parallel for better performance
-  const [client, categories, photoCategoriesResult] = await Promise.all([
-    getClientById(params.clientId),
+  const [client, categories, photoCategoriesResult] = (await Promise.all([
+    getClientById(clientId),
     getAllCategories(),
     getAllPhotoCategories(),
-  ]);
+  ])) as [Client | null, Category[] | null, PhotoCategoriesResponse];
 
   const PhotoCategories = photoCategoriesResult.success
     ? photoCategoriesResult.data
@@ -34,7 +40,7 @@ export default async function ClientPage({ params }: PageProps) {
         categories={safeCategories}
         photoCategories={safePhotoCategories}
         editingId={client?.id}
-        initialData={client as any}
+        initialData={client}
       />
     </div>
   );
