@@ -118,6 +118,12 @@ export function Footer() {
           </p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <a
+              href="login"
+              className="text-gray-600 hover:text-amber-600 transition-colors"
+            >
+              Admin
+            </a>
+            <a
               href="#"
               className="text-gray-600 hover:text-amber-600 transition-colors"
             >

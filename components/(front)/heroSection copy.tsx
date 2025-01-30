@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-// import { Client } from "@prisma/client";
 
-export default function HeroSection({
-  initialClient,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialClient: any;
-}) {
-  console.log(`${initialClient} , client details`);
-  // const [client, setClient] = useState(initialClient);
+export default function HeroSection({ slug }: { slug: string }) {
   const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
@@ -24,7 +20,7 @@ export default function HeroSection({
       <div className="relative w-full h-full">
         {/* Background image */}
         <Image
-          src={initialClient?.imageUrl || ""}
+          src="/denis-prossy/highlights/N77A9197.jpg"
           alt="Wedding Photo"
           fill
           className="object-cover"
@@ -43,11 +39,11 @@ export default function HeroSection({
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          <h1 className="text-4xl uppercase md:text-7xl font-light tracking-wider transition-all duration-500">
-            {initialClient?.title}
+          <h1 className="text-4xl md:text-7xl font-light tracking-wider transition-all duration-500">
+            {slug}
           </h1>
           <p className="md:text-xl text-md tracking-[0.2em] transition-all duration-500">
-            {initialClient?.eventDate.toDateString()}
+            NOVEMBER 23RD 2024
           </p>
           <Button
             // variant="outline"
