@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,17 +6,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, JSX } from "react";
 import toast from "react-hot-toast";
 import { Category, Client, PhotoCategory } from "@prisma/client";
-
-interface ClientFormData {
-  title: string;
-  description?: string;
-  eventDate: string;
-  youtubeUrl?: string;
-  categoryId: string;
-  imageUrl?: string;
-  galleryImages: string[];
-  slug: string;
-}
 import { useForm } from "react-hook-form";
 import { generateSlug } from "@/lib/generateSlug";
 import { createClient, updateClientById } from "@/actions/client";
@@ -23,12 +13,12 @@ import ImageInput from "../(formInputs)/ImageInput";
 import TextArea from "../(formInputs)/TextAreaInput";
 import TextInput from "../(formInputs)/TextInput";
 import FormHeader from "../(forms)/FormHeader";
-import ShadSelectInput from "../(forms)/ShadSelectInput";
-import NewButton from "../(forms)/NewButton";
+
 import MultipleImageInput from "../(forms)/MultipleImageInput";
 import FormFooter from "../(forms)/FormFooter";
 import { Popup } from "./popupcat";
 import { AddEventCategoryForm } from "./AddPhotoscategory";
+import FormSelectInput from "../(forms)/ShadSelectInput";
 
 interface ExtendedClient extends Client {
   eventCategories?: PhotoCategory[];
@@ -66,17 +56,42 @@ export default function ClientEditForm({
 
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [categoryId, setCategoryId] = useState<string>("");
-  const [selectedPhotoCategories, setSelectedPhotoCategories] = useState<
-    string[]
-  >([]);
+
+  // Transform categories for FormSelectInput
+  const categoryOptions =
+    categories?.map((category) => ({
+      value: category.id,
+      label: category.title,
+    })) || [];
+
+  // Transform photoCategories for FormSelectInput
+  const photoCategoryOptions =
+    photoCategories?.map((category) => ({
+      value: category.id,
+      label: category.title,
+    })) || [];
+
+  // Initialize selected categories with new approach
+  const initialCategoryId = initialData?.categoryId;
+  const initialCategory = categoryOptions.find(
+    (item) => item.value === initialCategoryId
+  );
+  const [selectedCategory, setSelectedCategory] =
+    useState<any>(initialCategory);
+
+  const initialPhotoCategory = initialData?.eventCategories?.map((ec) => ({
+    value: ec.id,
+    label: ec.title,
+  }));
+  const [selectedPhotoCategory, setSelectedPhotoCategory] =
+    useState<any>(initialPhotoCategory);
+
   const [imageUrl, setImageUrl] = useState<string>("/placeholder.svg");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false);
   const [isPhotoCategoryPopupOpen, setIsPhotoCategoryPopupOpen] =
     useState(false);
 
-  // Initialize form data when initialData changes
   useEffect(() => {
     if (initialData) {
       setValue("title", initialData.title);
@@ -88,23 +103,19 @@ export default function ClientEditForm({
           : ""
       );
       setValue("youtubeUrl", initialData.youtubeUrl || "");
-      setCategoryId(initialData.categoryId);
-      setSelectedPhotoCategories(
-        initialData.eventCategories?.map((ec) => ec.id) || []
-      );
       setImageUrl(initialData.imageUrl || "/placeholder.svg");
       setGalleryImages(initialData.galleryImages || []);
     }
   }, [initialData, setValue]);
 
   const validateForm = () => {
-    if (!categoryId) {
+    if (!selectedCategory) {
       toast.error("Please select a category");
       return false;
     }
 
-    if (selectedPhotoCategories.length === 0) {
-      toast.error("Please select at least one event category");
+    if (!selectedPhotoCategory) {
+      toast.error("Please select at least one photo category");
       return false;
     }
 
@@ -124,12 +135,12 @@ export default function ClientEditForm({
 
     try {
       setLoading(true);
-      const clientData: ClientFormData = {
+      const clientData = {
         title: data.title,
-        description: data.description || undefined, // Convert null to undefined
+        description: data.description || undefined,
         eventDate: data.eventDate,
-        youtubeUrl: data.youtubeUrl || undefined, // Convert null to undefined
-        categoryId,
+        youtubeUrl: data.youtubeUrl || undefined,
+        categoryId: selectedCategory.value,
         imageUrl: imageUrl !== "/placeholder.svg" ? imageUrl : undefined,
         galleryImages,
         slug: generateSlug(data.title),
@@ -139,9 +150,7 @@ export default function ClientEditForm({
         const result = await updateClientById(editingId, clientData);
         if (result) {
           toast.success("Client updated successfully!");
-          // Route to the category page using the category slug
-          const category = categories?.find((cat) => cat.id === categoryId);
-          router.push(`/dashboard/categories/${category?.slug}`);
+          router.push(`/dashboard/categories/${selectedCategory.slug}`);
         } else {
           toast.error("Failed to update client");
         }
@@ -149,26 +158,14 @@ export default function ClientEditForm({
         const result = await createClient(clientData);
         if (result.success) {
           toast.success("Client created successfully!");
-          // Route to the category page using the category slug
-          const category = categories?.find((cat) => cat.id === categoryId);
-          router.push(`/dashboard/categories/${category?.slug}`);
+          router.push(`/dashboard/categories/${selectedCategory.slug}`);
           reset();
           setImageUrl("/placeholder.svg");
           setGalleryImages([]);
-          setCategoryId("");
-          setSelectedPhotoCategories([]);
+          setSelectedCategory(null);
+          setSelectedPhotoCategory(null);
         } else {
-          switch (result.statusCode) {
-            case 400:
-              toast.error("Please fill in all required fields");
-              break;
-            case 409:
-              toast.error("A client with this name already exists");
-              break;
-            default:
-              toast.error(result.error || "Failed to create client");
-          }
-          return;
+          toast.error(result.error || "Failed to create client");
         }
       }
     } catch (error) {
@@ -205,7 +202,6 @@ export default function ClientEditForm({
                   errors={errors}
                   label="Client Title"
                   name="title"
-                  // required
                 />
 
                 <TextInput
@@ -214,7 +210,6 @@ export default function ClientEditForm({
                   label="Event Date"
                   name="eventDate"
                   type="date"
-                  // required
                 />
 
                 <TextInput
@@ -233,90 +228,36 @@ export default function ClientEditForm({
                 />
 
                 <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
-                    <div className="flex-1 w-full">
-                      {categories && categories.length > 0 ? (
-                        <ShadSelectInput
+                  <Card>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3">
+                        <FormSelectInput
                           label="Choose Category"
-                          optionTitle="select from below"
-                          options={categories.map((category: Category) => ({
-                            value: category.id,
-                            label: category.title,
-                          }))}
-                          selectedOption={categoryId}
-                          setSelectedOption={(value) => {
-                            if (typeof value === "string") {
-                              setCategoryId(value);
-                            } else {
-                              console.error(
-                                "Unexpected value type for categoryId:",
-                                value
-                              );
-                            }
-                          }}
-                          initialData={initialData?.categoryId}
+                          options={categoryOptions}
+                          option={selectedCategory}
+                          setOption={setSelectedCategory}
+                          toolTipText="Add New Category"
+                          href="/dashboard/categories/new"
                         />
-                      ) : (
-                        <p className="text-red-600 text-sm">
-                          No categories available
-                        </p>
-                      )}
-                    </div>
-                    <div className="sm:mt-8">
-                      <NewButton
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setIsCategoryPopupOpen(true);
-                        }}
-                        toolTipText="Add Category"
-                        title="Add category"
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3">
+                      <FormSelectInput
+                        label="Photo Categories"
+                        options={photoCategoryOptions}
+                        option={selectedPhotoCategory}
+                        setOption={setSelectedPhotoCategory}
+                        toolTipText="Add New Photo Category"
+                        href="/dashboard/photo-categories/new"
                       />
                     </div>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
-                  <div className="flex-1 w-full">
-                    <ShadSelectInput
-                      label="Photo Categories (Optional)"
-                      optionTitle="Select a category"
-                      options={[
-                        { value: "all", label: "All" }, // Default category
-                        ...(photoCategories ?? []).map(
-                          (category: PhotoCategory) => ({
-                            value: category.id,
-                            label: category.title,
-                          })
-                        ),
-                      ]}
-                      selectedOption={selectedPhotoCategories}
-                      setSelectedOption={(value) => {
-                        if (typeof value === "string") {
-                          setCategoryId(value);
-                        } else {
-                          console.error(
-                            "Unexpected value type for categoryId:",
-                            value
-                          );
-                        }
-                      }}
-                      initialData={
-                        initialData?.eventCategories?.map((ec) => ec.id) || [
-                          "all",
-                        ]
-                      }
-                    />
-                  </div>
-                  <div className="sm:mt-8">
-                    <NewButton
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsPhotoCategoryPopupOpen(true);
-                      }}
-                      toolTipText="Add Photo Category"
-                      title="Add photo category"
-                    />
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>

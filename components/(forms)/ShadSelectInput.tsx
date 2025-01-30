@@ -1,54 +1,48 @@
-import * as React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
-interface SelectOption {
-  value: string;
+import React from "react";
+import Select from "react-tailwindcss-select";
+import { Option, Options } from "react-tailwindcss-select/dist/components/type";
+import AddNewButton from "../(formInputs)/addNewBtn";
+type FormSelectInputProps = {
+  options: Options;
   label: string;
-}
-
-interface ShadSelectInputProps {
-  label: string;
-  optionTitle: string;
-  options: SelectOption[];
-  selectedOption: string | string[]; // Supports both single and multiple selections
-  setSelectedOption: (value: string | string[]) => void;
-  initialData?: string | string[];
-}
-
-export default function ShadSelectInput({
-  label,
-  optionTitle,
+  option: Option;
+  setOption: any;
+  href?: string;
+  labelShown?: boolean;
+  toolTipText?: string;
+};
+export default function FormSelectInput({
   options,
-  selectedOption,
-  setSelectedOption,
-}: ShadSelectInputProps) {
-  // Handle single or multiple selections
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { options } = e.target;
-    const values = Array.from(options)
-      .filter((option) => option.selected)
-      .map((option) => option.value);
-
-    setSelectedOption(values.length > 1 ? values : values[0]);
-  };
-
+  label,
+  option,
+  setOption,
+  href,
+  toolTipText,
+  labelShown = true,
+}: FormSelectInputProps) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        {label}
-      </label>
-      <select
-        multiple // Enables multi-select
-        value={Array.isArray(selectedOption) ? selectedOption : [selectedOption]}
-        onChange={handleChange}
-        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <option value="">{optionTitle}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+    <div className="">
+      {labelShown && (
+        <h2 className="pb-2 block text-sm font-medium leading-6 text-gray-900">
+          Select {label}
+        </h2>
+      )}
+      <div className="flex items-center space-x-2">
+        <Select
+          isSearchable
+          primaryColor="blue"
+          value={option}
+          onChange={(item) => setOption(item)}
+          options={options}
+          placeholder={label}
+        />
+        {href && toolTipText && (
+          <AddNewButton toolTipText={toolTipText} href={href} />
+        )}
+      </div>
     </div>
   );
 }
