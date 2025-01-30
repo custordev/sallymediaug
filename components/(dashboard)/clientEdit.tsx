@@ -5,6 +5,17 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, JSX } from "react";
 import toast from "react-hot-toast";
 import { Category, Client, PhotoCategory } from "@prisma/client";
+
+interface ClientFormData {
+  title: string;
+  description?: string;
+  eventDate: string;
+  youtubeUrl?: string;
+  categoryId: string;
+  imageUrl?: string;
+  galleryImages: string[];
+  slug: string;
+}
 import { useForm } from "react-hook-form";
 import { generateSlug } from "@/lib/generateSlug";
 import { createClient, updateClientById } from "@/actions/client";
@@ -18,7 +29,6 @@ import MultipleImageInput from "../(forms)/MultipleImageInput";
 import FormFooter from "../(forms)/FormFooter";
 import { Popup } from "./popupcat";
 import { AddEventCategoryForm } from "./AddPhotoscategory";
-import { ClientFormData } from "@/types/types";
 
 interface ExtendedClient extends Client {
   eventCategories?: PhotoCategory[];
@@ -123,7 +133,6 @@ export default function ClientEditForm({
         imageUrl: imageUrl !== "/placeholder.svg" ? imageUrl : undefined,
         galleryImages,
         slug: generateSlug(data.title),
-        photos: [],
       };
 
       if (editingId) {
@@ -235,7 +244,11 @@ export default function ClientEditForm({
                             label: category.title,
                           }))}
                           selectedOption={categoryId}
-                          setSelectedOption={setCategoryId}
+                          setSelectedOption={(value: string | string[]) => {
+                            if (typeof value === "string") {
+                              setCategoryId(value);
+                            }
+                          }}
                           initialData={initialData?.categoryId}
                         />
                       ) : (
@@ -258,29 +271,30 @@ export default function ClientEditForm({
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
                   <div className="flex-1 w-full">
-                    {photoCategories && photoCategories.length > 0 ? (
-                      <ShadSelectInput
-                        label="Photo Categories (Optional)"
-                        optionTitle="select photo categories"
-                        options={photoCategories.map(
+                    <ShadSelectInput
+                      label="Photo Categories (Optional)"
+                      optionTitle="Select a category"
+                      options={[
+                        { value: "all", label: "All" }, // Default category
+                        ...(photoCategories ?? []).map(
                           (category: PhotoCategory) => ({
                             value: category.id,
                             label: category.title,
                           })
-                        )}
-                        selectedOption={selectedPhotoCategories}
-                        setSelectedOption={setSelectedPhotoCategories}
-                        initialData={initialData?.eventCategories?.map(
-                          (ec) => ec.id
-                        )}
-                        // required={false}
-                      />
-                    ) : (
-                      <p className="text-gray-500 text-sm">
-                        No custom photo categories available. Photos will be
-                        added to &quot;All&quot; category by default.
-                      </p>
-                    )}
+                        ),
+                      ]}
+                      selectedOption={selectedPhotoCategories}
+                      setSelectedOption={(value: string | string[]) => {
+                        if (Array.isArray(value)) {
+                          setSelectedPhotoCategories(value);
+                        }
+                      }}
+                      initialData={
+                        initialData?.eventCategories?.map((ec) => ec.id) || [
+                          "all",
+                        ]
+                      }
+                    />
                   </div>
                   <div className="sm:mt-8">
                     <NewButton
