@@ -1265,17 +1265,7 @@ export const categories: Category[] = [
   },
 ];
 
-// export interface ClientFormData {
-//   title: string;
-//   slug: string;
-//   description?: string; // Changed from string | null to string | undefined
-//   eventDate: string;
-//   youtubeUrl?: string; // Changed from string | null to string | undefined
-//   categoryId: string;
-//   photos: string[];
-//   imageUrl?: string; // Changed from string | null to string | undefined
-//   galleryImages: string[];
-// }
+
 
 export function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
