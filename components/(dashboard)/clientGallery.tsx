@@ -7,8 +7,6 @@ import { VideoSection } from "./dashboard/(client)/VideoSection";
 import { CategorySection } from "./dashboard/(client)/CategorySection";
 import { PhotoGrid } from "./dashboard/(client)/PhotoGrid";
 
-
-
 export default function ClientGallery({
   initialClient,
 }: {
@@ -30,7 +28,6 @@ export default function ClientGallery({
       />
       <PhotoGrid
         client={client}
-        setClient={setClient}
         activeCategory={activeCategory}
       />
     </div>

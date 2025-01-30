@@ -1,52 +1,75 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { revalidatePath } from "next/cache";
 import db from "@/prisma/db";
 
 /** Create a new photo */
 export async function createPhoto(data: {
   url: string;
+  description?: string;
   clientId: string;
   categoryId?: string;
-  description?: string;
 }) {
   try {
-    let categoryId = data.categoryId;
-
-    // If no category is specified, use or create the "All" category
-    if (!categoryId) {
-      const allCategory = await db.photoCategory.findFirst({
-        where: { title: "All" },
-      });
-      categoryId = allCategory?.id;
-
-      if (!categoryId) {
-        const newAllCategory = await db.photoCategory.create({
-          data: {
-            title: "All",
-            slug: "all",
-            description: "Default category for all photos",
-          },
-        });
-        categoryId = newAllCategory.id;
-      }
-    }
+    const defaultCategory = await ensureDefaultPhotoCategory();
 
     const photo = await db.photo.create({
       data: {
         url: data.url,
-        clientId: data.clientId,
-        categoryId,
         description: data.description,
+        clientId: data.clientId,
+        categoryId: data.categoryId || defaultCategory.id,
       },
       include: {
         category: true,
+        client: true,
       },
     });
 
-    revalidatePath(`/dashboard/clients/${data.clientId}`);
-    return { success: true, data: photo };
+    return photo;
   } catch (error) {
     console.error("Error creating photo:", error);
-    return { success: false, error: "Failed to create photo" };
+    throw new Error("Failed to create photo");
+  }
+}
+export async function getAllPhotos() {
+  try {
+  
+
+    // Now fetch all photos safely
+    const photos = await db.photo.findMany({
+      select: {
+        id: true,
+        url: true,
+        description: true,
+        clientId: true,
+        client: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        categoryId: true,
+        category: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+      where: {
+        AND: [
+          { categoryId: { not: null as any } },
+          { clientId: { not: null as any } },
+        ],
+      },
+    });
+
+    return photos;
+  } catch (error) {
+    console.error("Error fetching photos:", error);
+    // throw new Error("Failed to fetch photos");
   }
 }
 
@@ -172,3 +195,28 @@ export async function deletePhoto(photoId: string) {
     return { success: false, error: "Failed to delete photo" };
   }
 }
+
+async function ensureDefaultPhotoCategory() {
+  try {
+    let defaultCategory = await db.photoCategory.findFirst({
+      where: { slug: "uncategorized" },
+    });
+
+    if (!defaultCategory) {
+      defaultCategory = await db.photoCategory.create({
+        data: {
+          title: "Uncategorized",
+          slug: "uncategorized",
+          description: "Default category for uncategorized photos",
+        },
+      });
+    }
+
+    return defaultCategory;
+  } catch (error) {
+    console.error("Error ensuring default category:", error);
+    throw error;
+  }
+}
+
+

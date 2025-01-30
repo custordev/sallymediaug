@@ -46,22 +46,52 @@ export default function ClientForm({
       eventDate: initialData?.eventDate
         ? new Date(initialData.eventDate).toISOString().split("T")[0]
         : "",
-      youtubeUrl: initialData?.youtubeUrl || "",
+      youtubeUrl: initialData?.youtubeUrl?.trim() || null,
     },
   });
 
   const [categoryId, setCategoryId] = useState<string>(
     initialData?.categoryId || ""
   );
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(
     initialData?.imageUrl || "/placeholder.svg"
   );
   const [galleryImages, setGalleryImages] = useState<string[]>(
     initialData?.galleryImages || []
   );
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
+  // async function saveClient(data: any) {
+  //   try {
+  //     setLoading(true);
+  //     const clientData = {
+  //       ...data,
+  //       categoryId,
+  //       imageUrl,
+  //       galleryImages,
+  //       slug: generateSlug(data.title),
+  //     };
+
+  //     if (editingId) {
+  //       await updateClientById(editingId, clientData);
+  //       toast.success("Updated Successfully!");
+  //       router.push("/dashboard/clients");
+  //     } else {
+  //       await createClient(clientData);
+  //       toast.success("Successfully Created!");
+  //       reset();
+  //       setImageUrl("/placeholder.svg");
+  //       setGalleryImages([]);
+  //       router.push("/dashboard/clients");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Something went wrong!");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
   async function saveClient(data: any) {
     try {
       setLoading(true);
@@ -69,30 +99,28 @@ export default function ClientForm({
         ...data,
         categoryId,
         imageUrl,
-        galleryImages,
+        galleryImages, // Pass gallery images to be saved as photos
         slug: generateSlug(data.title),
       };
 
       if (editingId) {
         await updateClientById(editingId, clientData);
         toast.success("Updated Successfully!");
-        router.push("/dashboard/clients");
       } else {
         await createClient(clientData);
         toast.success("Successfully Created!");
         reset();
         setImageUrl("/placeholder.svg");
         setGalleryImages([]);
-        router.push("/dashboard/clients");
       }
+      router.push("/dashboard/clients");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Something went wrong!");
     } finally {
       setLoading(false);
     }
   }
-
   return (
     <form
       className="dark:bg-black/50 backdrop-blur-sm"
@@ -132,9 +160,10 @@ export default function ClientForm({
                 <TextInput
                   register={register}
                   errors={errors}
-                  label="YouTube URL"
+                  label="YouTube URL (Optional)"
                   name="youtubeUrl"
                   placeholder="https://youtube.com/..."
+                  required={false} // Optional field
                 />
 
                 <TextArea
@@ -150,13 +179,13 @@ export default function ClientForm({
                       <ShadSelectInput
                         label="Choose Category"
                         optionTitle="select from below"
-                        options={categories.map((category: any) => ({
-                          value: category.id,
+                        options={categories.map((category) => ({
+                          value: category.id as string,
                           label: category.title,
                         }))}
-                        selectedOption={categoryId}
-                        setSelectedOption={setCategoryId}
-                        initialData={initialData?.categoryId}
+                        selectedOption={categoryId || ""} // Ensure a default value
+                        setSelectedOption={(value) => setCategoryId(value)} // Make sure it always sets a string
+                        initialData={initialData?.categoryId || ""} // Ensure initialData is a string
                       />
                     ) : (
                       <p className="text-red-600 text-sm">

@@ -61,22 +61,22 @@ export function Footer() {
           <div className="text-center md:text-left">
             <h3 className="text-sm font-semibold mb-4">SAY HELLO</h3>
             <a
-              href="mailto:hello@dreamlens.com"
+              href="mailto: sallymediaug@gamail.com"
               className="text-gray-600 hover:text-amber-600 flex items-center justify-center md:justify-start gap-2 transition-colors"
             >
               <Mail size={16} />
-              hello@dreamlens.com
+              sallymediaug@gamail.com
             </a>
           </div>
 
           <div className="text-center">
             <h3 className="text-sm font-semibold mb-4">WHATSAPP</h3>
             <a
-              href="tel:+1234567890"
+              href="tel:+256782074777"
               className="text-gray-600 hover:text-amber-600 flex items-center justify-center gap-2 transition-colors"
             >
-              <Phone size={16} />
-              +1 (234) 567-890
+              <Phone size={16} className="text-green-400" />
+              +256 (782) 074777
             </a>
           </div>
 
@@ -85,7 +85,7 @@ export function Footer() {
             <div className=" hidden lg:flex gap-4 mt-4 sm:justify-center sm:mt-0">
               <Link
                 title="Twitter"
-                href="https://twitter.com/cus_tor"
+                href="https://youtube.com/@sallymediaug?si=6n4WdgWgoC6oWJ-E"
                 className="bg-[#000211] dark:bg-amber-600 px-1 py-1 rounded-md
                      text-amber-50"
               >
@@ -93,7 +93,7 @@ export function Footer() {
               </Link>
               <Link
                 title="Instagram"
-                href="https://www.instagram.com/custordev/"
+                href="https://youtube.com/@sallymediaug?si=6n4WdgWgoC6oWJ-E"
                 className="bg-[#000211] dark:bg-amber-600 px-1 py-1 rounded-md
            text-amber-50  "
               >
@@ -102,7 +102,7 @@ export function Footer() {
 
               <Link
                 title="youtube"
-                href="https://www.youtube.com/@custorDev"
+                href="https://youtube.com/@sallymediaug?si=6n4WdgWgoC6oWJ-E"
                 className="bg-[#000211] dark:bg-amber-600 px-1 py-1 rounded-md
            text-amber-50"
               >

@@ -15,13 +15,29 @@ export interface ExtendedClient {
   updatedAt: Date;
 }
 
+export interface ClientFormData {
+  title: string;
+  slug: string;
+  description?: string;
+  eventDate: string | Date;
+  imageUrl?: string;
+  youtubeUrl?: string | null;
+  categoryId: string;
+  galleryImages?: string[];
+}
+
 export interface Client {
+  youtubeUrl: string | undefined;
+  categoryId: string;
+  id(id: any, arg1: { photos: Photo[]; title: string; eventDate: string; description: string; imageUrl: string; }): unknown;
+  photos: never[];
   title: string;
   eventDate: string;
   description: string;
   imageUrl: string;
 }
 export interface Photo {
+  url: string;
   src: string;
 }
 
@@ -1059,17 +1075,17 @@ export const categories: Category[] = [
   },
 ];
 
-export interface ClientFormData {
-  title: string;
-  slug: string;
-  description?: string; // Changed from string | null to string | undefined
-  eventDate: string;
-  youtubeUrl?: string; // Changed from string | null to string | undefined
-  categoryId: string;
-  photos: string[];
-  imageUrl?: string; // Changed from string | null to string | undefined
-  galleryImages: string[];
-}
+// export interface ClientFormData {
+//   title: string;
+//   slug: string;
+//   description?: string; // Changed from string | null to string | undefined
+//   eventDate: string;
+//   youtubeUrl?: string; // Changed from string | null to string | undefined
+//   categoryId: string;
+//   photos: string[];
+//   imageUrl?: string; // Changed from string | null to string | undefined
+//   galleryImages: string[];
+// }
 
 export function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);

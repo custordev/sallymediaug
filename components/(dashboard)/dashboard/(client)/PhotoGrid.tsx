@@ -1,96 +1,84 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { updateClientById } from "@/actions/client";
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { Lightbox } from "./LightBox";
-import { PhotoUploadDialog } from "./PhotoUploadDialog";
+
+import type { Photo, Client } from "@/types/types";
+import { createPhoto, deletePhoto } from "@/actions/photos";
+import MultipleImageInput from "@/components/(forms)/MultipleImageInput";
 import { PhotoCard } from "./PhotoCard";
-import { Photo } from "@/types/types";
 
-export function PhotoGrid({ client, setClient, activeCategory }: any) {
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [loading, setLoading] = useState(false);
+interface PhotoGridProps {
+  client: Client;
+  activeCategory: string;
+}
 
-  const filteredPhotos =
-    activeCategory === "All"
-      ? client.photos || []
-      : (client.photos || []).filter(
-          (photo: { category: string }) => photo.category === activeCategory
-        );
+export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
+  const [photos, setPhotos] = useState<Photo[]>(client.photos || []);
+  const [uploading, setUploading] = useState(false);
 
-  const handlePhotoUpload = async (newPhotos: string[]) => {
-    setLoading(true);
+  const handlePhotoUpload = async (newUrls: string[]) => {
+    setUploading(true);
     try {
-      const photoObjects = newPhotos.map((src) => ({
-        src,
-        category:
-          activeCategory !== "All"
-            ? activeCategory
-            : client.eventCategories?.[0]?.title || "Uncategorized",
-      }));
-
-      const updated = await updateClientById(client.id, {
-        ...client,
-        photos: [...(client.photos || []), ...photoObjects],
-      });
-
-      if (updated) {
-        setClient(updated);
-        toast.success("Photos uploaded successfully");
+      for (const url of newUrls) {
+        const newPhoto = await createPhoto({
+          url,
+          clientId: String(client.id),
+          categoryId: activeCategory !== "All" ? activeCategory : undefined,
+        });
+        // if (newPhoto) {
+        //   setPhotos((prevPhotos) => [...prevPhotos, newPhoto]);
+        // }
       }
+      toast.success("Photos uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload photos");
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
+  const handlePhotoDelete = async (photoId: string) => {
+    try {
+      const result = await deletePhoto(photoId);
+      if (result.success) {
+        setPhotos((prevPhotos) => prevPhotos.filter((p) => p.id !== photoId));
+        toast.success("Photo deleted successfully");
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toast.error("Failed to delete photo");
+    }
+  };
+
+  const filteredPhotos =
+    activeCategory === "All"
+      ? photos
+      : photos.filter((photo) => photo.category === activeCategory);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-      <PhotoUploadDialog onUpload={handlePhotoUpload} loading={loading} />
-
-      {filteredPhotos.map((photo: Photo, index: SetStateAction<number>) => (
-        <PhotoCard
-          key={photo.id || (index as number)}
-          photo={photo}
-          onClick={() => {
-            setCurrentPhotoIndex(index);
-            setLightboxOpen(true);
-          }}
-          onDelete={async () => {
-            const updated = await updateClientById(client.id, {
-              ...client,
-              photos: client.photos.filter((p: any) => p.id !== photo.id),
-            });
-            if (updated) {
-              setClient(updated);
-              toast.success("Photo deleted successfully");
-            }
-          }}
-          index={0}
-        />
-      ))}
-
-      {lightboxOpen && (
-        <Lightbox
-          photos={filteredPhotos}
-          currentIndex={currentPhotoIndex}
-          onClose={() => setLightboxOpen(false)}
-          onNext={() =>
-            setCurrentPhotoIndex((prev) => (prev + 1) % filteredPhotos.length)
-          }
-          onPrev={() =>
-            setCurrentPhotoIndex(
-              (prev) =>
-                (prev - 1 + filteredPhotos.length) % filteredPhotos.length
-            )
-          }
-        />
-      )}
+    <div className="space-y-4">
+      <MultipleImageInput
+        title="Upload Photos"
+        imageUrls={[]}
+        setImageUrls={handlePhotoUpload}
+        categoryImage="categoryImage"
+      />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <AnimatePresence>
+          {filteredPhotos.map((photo, index) => (
+            <PhotoCard
+              key={photo.id}
+              photo={photo}
+              index={index}
+              onDelete={() => handlePhotoDelete(photo.id)}
+            />
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

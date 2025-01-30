@@ -6,12 +6,12 @@ const f = createUploadthing();
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
-  categoryImage: f({ image: { maxFileSize: "2MB" } }).onUploadComplete(
-    async ({ metadata, file }) => {
-      console.log("file url", file.url);
-      return { uploadedBy: "JB" };
-    }
-  ),
+  categoryImage: f({
+    image: { maxFileSize: "2MB", maxFileCount: 10 },
+  }).onUploadComplete(async ({ metadata, file }) => {
+    console.log("file url", file.url);
+    return { uploadedBy: "JB" };
+  }),
   staffImage: f({ image: { maxFileSize: "2MB" } }).onUploadComplete(
     async ({ metadata, file }) => {
       console.log("file url", file.url);

@@ -76,8 +76,6 @@ model Category {
   clients Client[]
 }
 
-
-
 model PhotoCategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String    @unique
@@ -86,18 +84,6 @@ model PhotoCategory {
   photos      Photo[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
-}
-
-model Photo {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  url           String
-  description   String?
-  clientId      String       @db.ObjectId
-  client        Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  categoryId    String       @db.ObjectId
-  category      PhotoCategory @relation(fields: [categoryId], references: [id])
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime?    @updatedAt
 }
 
 model Client {
@@ -113,4 +99,19 @@ model Client {
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
+}
+
+model Photo {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  url         String
+  description String?
+  clientId    String        @db.ObjectId
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  categoryId  String        @db.ObjectId
+  category    PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Changed from Restrict to Cascade
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime?     @updatedAt
+
+  @@index([clientId])
+  @@index([categoryId])
 }

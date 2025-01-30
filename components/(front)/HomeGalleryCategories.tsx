@@ -57,7 +57,7 @@ export default function Gallery({
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1  lg:grid-cols-4 gap-6 place-items-center ">
+        <div className="grid grid-cols-2  lg:grid-cols-4 gap-6 place-items-center ">
           {filteredClients.map((client) => (
             <GalleryCard key={client.id} client={client} />
           ))}

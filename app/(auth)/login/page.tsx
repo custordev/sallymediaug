@@ -1,14 +1,22 @@
 import { authOptions } from "@/app/config/auth";
 import LoginForm from "@/components/(forms)/LoginForm";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import React from "react";
 
-export default async function page() {
+export default async function LoginPage() {
   const session = await getServerSession(authOptions);
+
   if (session) {
-    redirect("/dashboard");
+    if (
+      session.user?.role === "admin" ||
+      session.user?.role === "service_provider"
+    ) {
+      redirect("/dashboard");
+    } else {
+      redirect("/");
+    }
   }
+
   return (
     <section>
       <div className="md:container lg:px-4 md:px-0  mt-8">

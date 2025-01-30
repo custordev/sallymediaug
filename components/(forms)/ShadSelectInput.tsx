@@ -1,76 +1,45 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-type SelectInputProps = {
-  label: string;
-  optionTitle: string;
-  className?: string;
-  options: SelectOption[];
-  selectedOption: any;
-  setSelectedOption: any;
-  initialData?: any;
-};
-
-export type SelectOption = {
+interface SelectOption {
   value: string;
   label: string;
-};
+}
+
+interface ShadSelectInputProps {
+  label: string;
+  optionTitle: string;
+  options: SelectOption[];
+  selectedOption: string;
+  setSelectedOption: (value: string) => void;
+  initialData?: string;
+}
 
 export default function ShadSelectInput({
   label,
-  className = "sm:col-span-2",
   optionTitle,
-  options = [],
+  options,
   selectedOption,
   setSelectedOption,
-  initialData,
-}: SelectInputProps) {
-  React.useEffect(() => {
-    if (initialData && !selectedOption) {
-      setSelectedOption(initialData);
-    }
-  }, [initialData, selectedOption, setSelectedOption]);
-
+}: ShadSelectInputProps) {
   return (
-    <div className={className}>
-      <label htmlFor={label} className="block text-sm font-medium leading-6 ">
+    <div className="space-y-2">
+      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         {label}
       </label>
-      <div className=" ">
-        <Select
-          onValueChange={(value) => setSelectedOption(value)}
-          value={selectedOption || initialData}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={`Select ${optionTitle}`} className="" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>{optionTitle}</SelectLabel>
-              {options.map((item) => {
-                return (
-                  <SelectItem
-                    key={item.value}
-                    value={item.value}
-                    className=" py-3 px-4 text-black"
-                  >
-                    {item.label}
-                  </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+      <select
+        // value={selectedOption || ""}
+        value={selectedOption ?? ""}
+        onChange={(e) => setSelectedOption(e.target.value)}
+        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <option value="">{optionTitle}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
