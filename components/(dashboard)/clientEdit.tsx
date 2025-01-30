@@ -244,9 +244,14 @@ export default function ClientEditForm({
                             label: category.title,
                           }))}
                           selectedOption={categoryId}
-                          setSelectedOption={(value: string | string[]) => {
+                          setSelectedOption={(value) => {
                             if (typeof value === "string") {
                               setCategoryId(value);
+                            } else {
+                              console.error(
+                                "Unexpected value type for categoryId:",
+                                value
+                              );
                             }
                           }}
                           initialData={initialData?.categoryId}
@@ -284,9 +289,14 @@ export default function ClientEditForm({
                         ),
                       ]}
                       selectedOption={selectedPhotoCategories}
-                      setSelectedOption={(value: string | string[]) => {
-                        if (Array.isArray(value)) {
-                          setSelectedPhotoCategories(value);
+                      setSelectedOption={(value) => {
+                        if (typeof value === "string") {
+                          setCategoryId(value);
+                        } else {
+                          console.error(
+                            "Unexpected value type for categoryId:",
+                            value
+                          );
                         }
                       }}
                       initialData={
