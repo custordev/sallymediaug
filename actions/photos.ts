@@ -31,10 +31,9 @@ export async function createPhoto(data: {
     throw new Error("Failed to create photo");
   }
 }
+
 export async function getAllPhotos() {
   try {
-  
-
     // Now fetch all photos safely
     const photos = await db.photo.findMany({
       select: {
@@ -152,6 +151,7 @@ export async function updatePhotoCategory(
   categoryId: string,
   data: { title?: string; slug?: string; description?: string }
 ) {
+  console.log(categoryId, data.title, data.slug, data.description, "the data");
   try {
     const category = await db.photoCategory.update({
       where: { id: categoryId },
@@ -218,5 +218,3 @@ async function ensureDefaultPhotoCategory() {
     throw error;
   }
 }
-
-

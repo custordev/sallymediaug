@@ -61,11 +61,11 @@ export function Footer() {
           <div className="text-center md:text-left">
             <h3 className="text-sm font-semibold mb-4">SAY HELLO</h3>
             <a
-              href="mailto: sallymediaug@gamail.com"
+              href="mailto: sallymedia777@gamail.com"
               className="text-gray-600 hover:text-amber-600 flex items-center justify-center md:justify-start gap-2 transition-colors"
             >
               <Mail size={16} />
-              sallymediaug@gamail.com
+              sallymedia777@gamail.com
             </a>
           </div>
 

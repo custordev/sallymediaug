@@ -145,6 +145,7 @@ export default function ClientEditForm({
         imageUrl: imageUrl !== "/placeholder.svg" ? imageUrl : undefined,
         galleryImages,
         slug: generateSlug(data.title),
+        photoCategoryId: selectedPhotoCategory?.value || null,
       };
 
       if (editingId) {
@@ -253,8 +254,6 @@ export default function ClientEditForm({
                         options={photoCategoryOptions}
                         option={selectedPhotoCategory}
                         setOption={setSelectedPhotoCategory}
-                        toolTipText="Add New Photo Category"
-                        href="/dashboard/photo-categories/new"
                       />
                     </div>
                   </CardContent>

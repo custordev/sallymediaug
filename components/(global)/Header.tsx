@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Heart, Download, Share2, PlayCircle } from 'lucide-react';
+import { Heart, Download, Share2, PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Category } from "@/types/types";
-
+import { Client } from "@prisma/client";
 
 interface HeaderProps {
   activeCategory: string;
@@ -15,9 +15,11 @@ interface HeaderProps {
   handleSlideshow: (e: React.MouseEvent) => void;
   isSlideshow: boolean;
   isCategoryFavorited: boolean;
+  initialClient: Client;
 }
 
 export function Header({
+  initialClient,
   activeCategory,
   categories,
   setActiveCategory,
@@ -32,7 +34,7 @@ export function Header({
     <header className="flex justify-between items-center py-6 mb-4">
       <div className="flex flex-col">
         <Link href="/" className="text-xl font-light">
-          Denis + Prossy
+          {initialClient.title}
         </Link>
         <Link href="/" className="text-xs">
           SALLY MEDIA UG
@@ -69,11 +71,7 @@ export function Header({
             fill={isCategoryFavorited ? "currentColor" : "none"}
           />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDownload}
-        >
+        <Button variant="ghost" size="icon" onClick={handleDownload}>
           <Download className="w-5 h-5" />
         </Button>
         <Button variant="ghost" size="icon" onClick={handleShare}>
@@ -94,4 +92,3 @@ export function Header({
     </header>
   );
 }
-

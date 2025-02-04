@@ -150,7 +150,7 @@ export default function ClientEditForm({
         const result = await updateClientById(editingId, clientData);
         if (result) {
           toast.success("Client updated successfully!");
-          router.push(`/dashboard/categories/${selectedCategory.slug}`);
+          router.push(`/dashboard/categories`);
         } else {
           toast.error("Failed to update client");
         }
@@ -158,7 +158,7 @@ export default function ClientEditForm({
         const result = await createClient(clientData);
         if (result.success) {
           toast.success("Client created successfully!");
-          router.push(`/dashboard/categories/${selectedCategory.slug}`);
+          router.push(`/dashboard/categories`);
           reset();
           setImageUrl("/placeholder.svg");
           setGalleryImages([]);

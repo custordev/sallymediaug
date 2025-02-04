@@ -1,6 +1,6 @@
 import HeroSection from "@/components/(front)/heroSection";
-// import PhotoGallery from "@/components/(front)/GridSection";
-import { getClientById } from "@/actions/client";
+import PhotoGallery, { Client } from "@/components/(front)/GridSection";
+import { getClientById,  } from "@/actions/client";
 
 export default async function GalleryDetail({
   params,
@@ -8,7 +8,7 @@ export default async function GalleryDetail({
   params: Promise<{ category: string; clientId: string }>;
 }) {
   const clientId = (await params).clientId;
-  const fetchedClient = await getClientById(clientId);
+  const fetchedClient = (await getClientById(clientId)) as unknown as Client;
   // console.log(fetchedClient);
 
   return (
@@ -17,7 +17,7 @@ export default async function GalleryDetail({
         <div className="mb-16">
           <HeroSection initialClient={fetchedClient} />
         </div>
-        {/* <PhotoGallery initialClient={fetchedClient} /> */}
+        {fetchedClient && <PhotoGallery initialClient={fetchedClient} />}
       </div>
     </section>
   );

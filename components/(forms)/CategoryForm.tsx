@@ -143,7 +143,7 @@ export default function CategoryForm({
               title="Category Image"
               imageUrl={imageUrl}
               setImageUrl={setImageUrl}
-              endpoint="categoryImage"
+              endpoint="clientImage"
             />
           </div>
         </div>

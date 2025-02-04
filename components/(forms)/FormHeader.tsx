@@ -7,7 +7,6 @@ import React from "react";
 import CloseButton from "../(formInputs)/CloseButton";
 import SubmitButton from "../(formInputs)/SubmitButton";
 
-
 type FormHeaderProps = {
   title: string;
   editingId: string | undefined;

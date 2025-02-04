@@ -36,9 +36,9 @@ export default function CategoryGallery({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex   justify-between items-start  gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-amber-700 capitalize mb-2">
+          <h1 className="lg:text-3xl text-2xl font-bold text-amber-700 capitalize mb-2">
             {category} Category
           </h1>
           <p className="text-muted-foreground">

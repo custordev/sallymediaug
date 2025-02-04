@@ -94,16 +94,16 @@ export async function createClient(data: ClientFormData): Promise<ApiResponse> {
 
     // Create client and photos in a single transaction
     const result = await db.$transaction(async (prisma) => {
-      // Ensure "All" photo category exists
+      // Ensure "Highlights" photo category exists
       let defaultPhotoCategory = await prisma.photoCategory.findFirst({
-        where: { slug: "all" },
+        where: { slug: "highlights" },
       });
 
       if (!defaultPhotoCategory) {
         defaultPhotoCategory = await prisma.photoCategory.create({
           data: {
-            title: "All",
-            slug: "all",
+            title: "HIGHLIGHTS",
+            slug: "highlights",
             description: "Default category for all photos",
           },
         });

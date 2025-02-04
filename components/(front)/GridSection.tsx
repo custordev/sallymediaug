@@ -1,14 +1,32 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { categories } from "@/types/types";
 import { Header } from "../(global)/Header";
 import { CategoryNav } from "./categoryNav";
 import { PhotoGrid } from "./photoGrid";
 import { FullscreenView } from "./fullScreenView";
 
-export default function PhotoGallery() {
+export interface Client {
+  photos?: { url: string; caption?: string }[];
+  youtubeUrl?: string;
+  name: string;
+}
+
+function getYouTubeVideoId(url: string): string | null {
+  const regex =
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|embed)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+}
+
+export default function PhotoGallery({
+  initialClient,
+}: {
+  initialClient: Client;
+}) {
   const [activeCategory, setActiveCategory] = useState("highlights");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -18,6 +36,22 @@ export default function PhotoGallery() {
   const [slideshowInterval, setSlideshowInterval] =
     useState<NodeJS.Timeout | null>(null);
   const [slideshowDelay, setSlideshowDelay] = useState(3000);
+
+  // Transform client data into categories format
+  const categories = [
+    {
+      id: "highlights",
+      title: "Highlights",
+      name: "Highlights",
+      photos:
+        initialClient.photos?.map((photo) => ({
+          src: photo.url,
+          alt: photo.caption || " photo",
+        })) || [],
+      youtubeUrl: initialClient.youtubeUrl || null,
+    },
+    // Add more categories if needed based on your data structure
+  ];
 
   const currentCategory =
     categories.find((cat) => cat.id === activeCategory) || categories[0];
@@ -36,12 +70,16 @@ export default function PhotoGallery() {
     setTimeout(() => setShowAlert({ show: false, message: "" }), 3000);
   };
 
+  const videoId = initialClient.youtubeUrl
+    ? getYouTubeVideoId(initialClient.youtubeUrl)
+    : null;
+
   const handleSlideshow = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
 
       if (!isSlideshow) {
-        if (!selectedImage) {
+        if (!selectedImage && photos.length > 0) {
           setSelectedImage(photos[0].src);
           setCurrentImageIndex(0);
         }
@@ -171,42 +209,44 @@ export default function PhotoGallery() {
     [currentCategory]
   );
 
-  const handleShare = useCallback(async (e: React.MouseEvent, src?: string) => {
-    e.stopPropagation();
+  const handleShare = useCallback(
+    async (e: React.MouseEvent, src?: string) => {
+      e.stopPropagation();
 
-    try {
-      if (!src) {
-        const galleryUrl = window.location.href;
+      try {
+        if (!src) {
+          const galleryUrl = window.location.href;
+          if (navigator.share) {
+            await navigator.share({
+              title: `${initialClient.name}'s Photo Gallery`,
+              text: `Check out ${initialClient.name}'s photo gallery`,
+              url: galleryUrl,
+            });
+            showAlertMessage("Shared gallery successfully!");
+          } else {
+            await navigator.clipboard.writeText(galleryUrl);
+            showAlertMessage("Gallery link copied to clipboard!");
+          }
+          return;
+        }
+
         if (navigator.share) {
           await navigator.share({
-            title: "Wedding Photo Gallery",
-            text: "Check out this wedding photo gallery",
-            url: galleryUrl,
+            title: `Photo from ${initialClient.name}'s gallery`,
+            text: `Check out this photo from ${initialClient.name}'s gallery`,
+            url: src,
           });
-          showAlertMessage("Shared gallery successfully!");
+          showAlertMessage("Shared successfully!");
         } else {
-          await navigator.clipboard.writeText(galleryUrl);
-          showAlertMessage("Gallery link copied to clipboard!");
+          await navigator.clipboard.writeText(src);
+          showAlertMessage("Link copied to clipboard!");
         }
-        return;
+      } catch (error) {
+        showAlertMessage("Error sharing image");
       }
-
-      if (navigator.share) {
-        await navigator.share({
-          title: "Check out this wedding photo",
-          text: "I found this beautiful wedding photo",
-          url: src,
-        });
-        showAlertMessage("Shared successfully!");
-      } else {
-        await navigator.clipboard.writeText(src);
-        showAlertMessage("Link copied to clipboard!");
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      showAlertMessage("Error sharing image");
-    }
-  }, []);
+    },
+    [initialClient]
+  );
 
   return (
     <div className="w-full max-w-[1800px] mx-auto px-4">
@@ -217,8 +257,9 @@ export default function PhotoGallery() {
       )}
 
       <Header
+      initialClient={initialClient as any}
         activeCategory={activeCategory}
-        categories={categories}
+        categories={categories as any}
         setActiveCategory={setActiveCategory}
         handleFavorite={(e) => handleFavorite(e)}
         handleDownload={(e) => handleDownload(e)}
@@ -231,19 +272,19 @@ export default function PhotoGallery() {
       />
 
       <CategoryNav
-        categories={categories}
+        categories={categories as any}
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
       />
 
       <section className="py-6">
         <div className="flex flex-col gap-4">
-          {activeCategory === "highlights" && (
+          {activeCategory === "highlights" && videoId && (
             <div className="aspect-video w-full bg-gray-100 rounded-lg overflow-hidden">
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/LrIXxSMqS98"
+                src={`https://www.youtube.com/embed/${videoId}`}
                 title="Highlights Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -252,7 +293,7 @@ export default function PhotoGallery() {
             </div>
           )}
           <PhotoGrid
-            photos={photos}
+            photos={photos as any}
             handleImageClick={handleImageClick}
             handleFavorite={handleFavorite}
             handleDownload={handleDownload}

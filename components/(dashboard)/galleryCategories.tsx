@@ -27,8 +27,8 @@ export default function CategoriesCategories({
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="flex justify-between items-center mb-12">
-        <h1 className="text-4xl font-bold text-amber-700">
-          Categories Categories
+        <h1 className="lg:text-4xl text-2xl font-bold text-amber-700">
+          Categories
         </h1>
 
         <Button

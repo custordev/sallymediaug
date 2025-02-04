@@ -65,7 +65,7 @@ export interface galleryPhoto {
 }
 
 export const categories: Category[] = [
-  // ... (keep the existing categories data here)
+
   {
     id: "highlights",
     name: "Highlights",
