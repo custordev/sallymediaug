@@ -1,6 +1,6 @@
 import { getAllCategories } from "@/actions/categories";
 import { getClientById } from "@/actions/client";
-import { getAllPhotoCategories } from "@/actions/photos";
+import { getPhotoCategories } from "@/actions/photoCategory";
 import ClientEditForm from "@/components/(dashboard)/clientEdit";
 import { Category, PhotoCategory, Client } from "@prisma/client";
 
@@ -24,7 +24,7 @@ export default async function ClientPage({ params }: PageProps) {
   const [client, categories, photoCategoriesResult] = (await Promise.all([
     getClientById(clientId),
     getAllCategories(),
-    getAllPhotoCategories(),
+    getPhotoCategories(),
   ])) as [Client | null, Category[] | null, PhotoCategoriesResponse];
 
   const PhotoCategories = photoCategoriesResult.success

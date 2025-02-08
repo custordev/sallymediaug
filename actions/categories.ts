@@ -1,32 +1,63 @@
 "use server";
 
+import { generateSlug } from "@/lib/generateSlug";
 import db from "@/prisma/db";
 import { CategoryProps } from "@/types/types";
 
 import { revalidatePath } from "next/cache";
 
+// export async function createCategory(data: CategoryProps) {
+//   const slug = data.slug;
+//   try {
+//     const existingCategory = await db.category.findUnique({
+//       where: {
+//         slug,
+//       },
+//     });
+//     if (existingCategory) {
+//       return existingCategory;
+//     }
+//     const newCategory = await db.category.create({
+//       data,
+//     });
+//     // console.log(newCategory);
+//     revalidatePath("/dashboard/categories");
+//     return newCategory;
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// }
+
 export async function createCategory(data: CategoryProps) {
-  const slug = data.slug;
   try {
-    const existingCategory = await db.category.findUnique({
-      where: {
-        slug,
+    // Validate required fields explicitly
+    if (!data.title) {
+      console.error("Title is required");
+      return null;
+    }
+
+    // Generate slug if not provided
+    data.slug = data.slug || generateSlug(data.title);
+
+    // Ensure all required fields are populated
+    const newCategory = await db.category.create({
+      data: {
+        title: data.title,
+        slug: data.slug,
+        description: data.description || "",
+        imageUrl: data.imageUrl || "/placeholder.svg",
       },
     });
-    if (existingCategory) {
-      return existingCategory;
-    }
-    const newCategory = await db.category.create({
-      data,
-    });
-    // console.log(newCategory);
-    revalidatePath("/dashboard/categories");
+
     return newCategory;
   } catch (error) {
-    console.log(error);
-    return null;
+    console.error("Category Creation Error:", error);
+    // Throw the error to get more details
+    throw error;
   }
 }
+
 export async function getAllCategories() {
   try {
     const categories = await db.category.findMany({
@@ -92,3 +123,25 @@ export async function createBulkCategories(categories: CategoryProps[]) {
     console.log(error);
   }
 }
+// export async function createCategory(data: CategoryProps) {
+//   const slug = data.slug;
+//   try {
+//     const existingCategory = await db.category.findUnique({
+//       where: {
+//         slug,
+//       },
+//     });
+//     if (existingCategory) {
+//       return existingCategory;
+//     }
+//     const newCategory = await db.category.create({
+//       data,
+//     });
+//     // console.log(newCategory);
+//     revalidatePath("/dashboard/categories");
+//     return newCategory;
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// }

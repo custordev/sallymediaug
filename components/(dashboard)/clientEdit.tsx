@@ -88,7 +88,7 @@ export default function ClientEditForm({
 
   const [imageUrl, setImageUrl] = useState<string>("/placeholder.svg");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
-  const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false);
+
   const [isPhotoCategoryPopupOpen, setIsPhotoCategoryPopupOpen] =
     useState(false);
 
@@ -120,10 +120,6 @@ export default function ClientEditForm({
     }
 
     return true;
-  };
-
-  const handleCategoryAdd = () => {
-    setIsCategoryPopupOpen(false);
   };
 
   const handlePhotoCategoryAdd = () => {
@@ -239,6 +235,13 @@ export default function ClientEditForm({
                           toolTipText="Add New Category"
                           href="/dashboard/categories/new"
                         />
+                        {/* <Button
+                          onClick={() =>
+                            router.push("/dashboard/categories/new")
+                          }
+                        >
+                          Add Category
+                        </Button> */}
                       </div>
                     </CardContent>
                   </Card>
@@ -269,7 +272,7 @@ export default function ClientEditForm({
               title="Client Featured Image"
               imageUrl={imageUrl}
               setImageUrl={setImageUrl}
-              endpoint="categoryImage"
+              endpoint="clientImage"
             />
 
             <MultipleImageInput
@@ -289,14 +292,6 @@ export default function ClientEditForm({
         title="Client"
         parent=""
       />
-
-      <Popup
-        isOpen={isCategoryPopupOpen}
-        onClose={() => setIsCategoryPopupOpen(false)}
-        title="Add Category"
-      >
-        <AddEventCategoryForm onSuccess={handleCategoryAdd} />
-      </Popup>
 
       <Popup
         isOpen={isPhotoCategoryPopupOpen}

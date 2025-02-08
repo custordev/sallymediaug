@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import db from "@/prisma/db";
 import { ClientUpdateData } from "@/types/types";
 import { revalidatePath } from "next/cache";
+import { unstable_noStore as noStore } from "next/cache";
 
 type ApiResponse = {
   success: boolean;
@@ -179,6 +181,164 @@ interface ClientFormData {
   youtubeUrl?: string;
   categoryId: string;
   photos?: string[]; // Array of photo URLs if any initial photos are being added
+}
+
+// Updated interfaces
+interface PhotoWithCategory {
+  url: string;
+  description?: string;
+  categoryId: string;
+}
+
+interface ClientPhotoUpdateData extends ClientUpdateData {
+  photos?: PhotoWithCategory[];
+}
+
+export async function updateClientWithPhotos(
+  id: string,
+  data: ClientPhotoUpdateData
+) {
+  noStore(); // Disable caching for this action
+
+  try {
+    const result = await db.$transaction(async (prisma) => {
+      // 1. Update basic client information
+      const updatedClient = await prisma.client.update({
+        where: { id },
+        data: {
+          title: data.title,
+          eventDate: new Date(data.eventDate),
+          description: data.description,
+          youtubeUrl: data.youtubeUrl,
+        },
+      });
+
+      // 2. Handle new photos if they exist
+      if (data.photos && data.photos.length > 0) {
+        // Create all new photos with their respective categories
+        await Promise.all(
+          data.photos.map(async (photo) => {
+            return prisma.photo.create({
+              data: {
+                url: photo.url,
+                description: photo.description || "",
+                clientId: id,
+                categoryId: photo.categoryId,
+              },
+            });
+          })
+        );
+      }
+
+      // 3. Fetch the updated client with all relations
+      const completeClient = await prisma.client.findUnique({
+        where: { id },
+        include: {
+          category: true,
+          photos: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
+
+      return completeClient;
+    });
+
+    // Force immediate revalidation
+    revalidatePath(`/dashboard/gallery/${id}`);
+    revalidatePath(`/dashboard/gallery`);
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.error("Error updating client with photos:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update client",
+    };
+  }
+}
+
+// Function to create a new photo category for a specific client
+export async function createClientPhotoCategory(data: {
+  title: string;
+  slug: string;
+  description?: string;
+  clientId: string;
+}) {
+  noStore();
+
+  try {
+    const category = await db.photoCategory.create({
+      data: {
+        title: data.title,
+        slug: data.slug,
+        description: data.description,
+      },
+    });
+
+    revalidatePath(`/dashboard/gallery/${data.clientId}`);
+    return { success: true, data: category };
+  } catch (error) {
+    console.error("Error creating client photo category:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create category",
+    };
+  }
+}
+
+// Function to get all photos for a client grouped by category
+export async function getClientPhotosByCategory(clientId: string) {
+  noStore();
+
+  try {
+    const photos = await db.photo.findMany({
+      where: {
+        clientId,
+      },
+      include: {
+        category: true,
+      },
+      orderBy: {
+        category: {
+          title: "asc",
+        },
+      },
+    });
+
+    // Group photos by category
+    const photosByCategory = photos.reduce(
+      (acc, photo) => {
+        const categoryId = photo.category.id;
+        if (!acc[categoryId]) {
+          acc[categoryId] = {
+            category: photo.category,
+            photos: [],
+          };
+        }
+        acc[categoryId].photos.push(photo);
+        return acc;
+      },
+      {} as Record<string, { category: any; photos: any[] }>
+    );
+
+    return {
+      success: true,
+      data: Object.values(photosByCategory),
+    };
+  } catch (error) {
+    console.error("Error fetching client photos by category:", error);
+    return {
+      success: false,
+      error: "Failed to fetch photos",
+    };
+  }
 }
 
 export async function getAllClients() {

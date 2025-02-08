@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAllCategories } from "@/actions/categories";
 import { getClientById } from "@/actions/client";
-import { getAllPhotoCategories } from "@/actions/photos";
+import { getPhotoCategories } from "@/actions/photoCategory";
 
 import ClientEditForm from "@/components/(dashboard)/clientEdit";
 
@@ -19,7 +19,7 @@ export default async function ClientPage({ params }: PageProps) {
     const [client, categories, photoCategories] = await Promise.all([
       getClientById(clientId),
       getAllCategories(),
-      getAllPhotoCategories(),
+      getPhotoCategories(),
     ]);
 
     return (
@@ -37,7 +37,7 @@ export default async function ClientPage({ params }: PageProps) {
   // Handle new client creation
   const [categories, photoCategories] = await Promise.all([
     getAllCategories(),
-    getAllPhotoCategories(),
+    getPhotoCategories(),
   ]);
 
   return (

@@ -1,14 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-
-import type { Photo, Client } from "@/types/types";
+import type { Photo, Client, PhotoCategory } from "@/types/types";
 import { createPhoto, deletePhoto } from "@/actions/photos";
-import MultipleImageInput from "@/components/(forms)/MultipleImageInput";
 import { PhotoCard } from "./PhotoCard";
+
+import { getPhotoCategories } from "@/actions/photoCategory";
+import { Button } from "@/components/ui/button";
+import MultipleImageInput from "@/components/(forms)/MultipleImageInputDs";
 
 interface PhotoGridProps {
   client: Client;
@@ -18,21 +21,56 @@ interface PhotoGridProps {
 export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
   const [photos, setPhotos] = useState<Photo[]>(client.photos || []);
   const [uploading, setUploading] = useState(false);
+  const [photoCategories, setPhotoCategories] = useState<PhotoCategory[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
-  const handlePhotoUpload = async (newUrls: string[]) => {
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const result = await getPhotoCategories();
+      if (result.success) {
+        setPhotoCategories(result.data as PhotoCategory[]);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleImageSelection = (urls: string[]) => {
+    setSelectedImages(urls);
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!selectedCategoryId) {
+      toast.error("Please select a photo category");
+      return;
+    }
+
+    if (selectedImages.length === 0) {
+      toast.error("Please select images to upload");
+      return;
+    }
+
     setUploading(true);
     try {
-      for (const url of newUrls) {
-        const newPhoto = await createPhoto({
+      const uploadPromises = selectedImages.map((url) =>
+        createPhoto({
           url,
           clientId: String(client.id),
-          categoryId: activeCategory !== "All" ? activeCategory : undefined,
-        });
-        // if (newPhoto) {
-        //   setPhotos((prevPhotos) => [...prevPhotos, newPhoto]);
-        // }
+          categoryId: selectedCategoryId,
+        })
+      );
+
+      const results = await Promise.all(uploadPromises);
+      const successfulUploads = results.filter((result) => result.success);
+
+      if (successfulUploads.length > 0) {
+        const newPhotos = successfulUploads.map((result) => result.data as unknown as Photo);
+        setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos] as Photo[]);
+        setSelectedImages([]);
+        toast.success(
+          `${successfulUploads.length} photos uploaded successfully`
+        );
       }
-      toast.success("Photos uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload photos");
     } finally {
@@ -57,16 +95,28 @@ export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
   const filteredPhotos =
     activeCategory === "All"
       ? photos
-      : photos.filter((photo) => photo.category === activeCategory);
+      : photos.filter((photo) => {
+          if (typeof photo.category === 'string') {
+            return photo.category === activeCategory;
+          }
+          return photo.category && typeof photo.category !== 'string' && (photo.category as PhotoCategory).title === activeCategory;
+        });
 
   return (
     <div className="space-y-4">
       <MultipleImageInput
         title="Upload Photos"
-        imageUrls={[]}
-        setImageUrls={handlePhotoUpload}
+        imageUrls={selectedImages}
+        setImageUrls={handleImageSelection}
         categoryImage="categoryImage"
+        photoCategories={photoCategories}
+        selectedCategoryId={selectedCategoryId}
+        onCategoryChange={setSelectedCategoryId}
+        disabled={uploading}
       />
+      <Button onClick={handlePhotoUpload} disabled={uploading}>
+        {uploading ? "Uploading..." : "Save Images"}
+      </Button>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <AnimatePresence>
           {filteredPhotos.map((photo, index) => (

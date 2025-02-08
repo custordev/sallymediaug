@@ -1,9 +1,11 @@
 export function generateSlug(title: string): string {
-  // Convert title to lowercase and replace spaces with dashes
-  const slug = title.toLowerCase().replace(/\s+/g, "-");
-
-  // Remove special characters except for dashes
-  const cleanedSlug = slug.replace(/[^\w\-]/g, "");
-
-  return cleanedSlug;
+  return title
+    .toLowerCase()
+    .trim()
+    .normalize("NFD") // Normalize unicode characters
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with single dash
+    .replace(/^-+|-+$/g, "") // Remove leading/trailing dashes
+    .substring(0, 50); // Limit slug length
 }

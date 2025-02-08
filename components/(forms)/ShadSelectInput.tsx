@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// FormSelectWithPopup.tsx
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Select from "react-tailwindcss-select";
 import { Option, Options } from "react-tailwindcss-select/dist/components/type";
 import {
@@ -19,19 +18,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { generateSlug } from "@/lib/generateSlug";
-
 import { toast } from "react-hot-toast";
-import { createPhotoCategory } from "@/actions/photos";
+import { createPhotoCategory } from "@/actions/photoCategory";
 
 type FormSelectInputProps = {
   options: Options;
   label: string;
   option: Option;
-  setOption: any;
+  setOption: (option: Option | null) => void;
   href?: string;
   labelShown?: boolean;
   toolTipText?: string;
 };
+
 export default function FormSelectInput({
   options,
   label,
@@ -41,6 +40,7 @@ export default function FormSelectInput({
   toolTipText,
   labelShown = true,
 }: FormSelectInputProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -68,12 +68,8 @@ export default function FormSelectInput({
       });
 
       if (result.success) {
-        // Add the new category to options and select it
         if (result.data) {
-          const newOption = {
-            value: result.data.id,
-            label: result.data.title,
-          };
+          const newOption = { value: result.data.id, label: result.data.title };
           setOption(newOption);
         } else {
           toast.error("Failed to create category: No data returned");
@@ -89,6 +85,14 @@ export default function FormSelectInput({
       toast.error("An error occurred while creating the category");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddClick = () => {
+    if (href === "/dashboard/categories/new") {
+      router.push(href); // Redirect to add new category page
+    } else {
+      setIsOpen(true); // Show popup for photo category
     }
   };
 
@@ -108,57 +112,60 @@ export default function FormSelectInput({
             placeholder={label}
           />
         </div>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              className="flex-shrink-0"
-            >
-              <PlusCircle className="h-5 w-5" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Photo Category</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Category Title</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={3}
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Creating..." : "Create Category"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button
+          type="button"
+          size="icon"
+          variant="outline"
+          className="flex-shrink-0"
+          onClick={handleAddClick}
+        >
+          <PlusCircle className="h-5 w-5" />
+        </Button>
+
+        {/* Popup only for adding new photo category */}
+        {href !== "/dashboard/categories/new" && (
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Photo Category</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Category Title</Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? "Creating..." : "Create Category"}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );

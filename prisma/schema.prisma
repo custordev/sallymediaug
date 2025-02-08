@@ -67,7 +67,7 @@ model User {
 model Category {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  slug        String    @unique
+  slug        String @unique
   imageUrl    String?
   description String?
   createdAt   DateTime  @default(now())
@@ -76,6 +76,10 @@ model Category {
   clients Client[]
 }
 
+
+
+
+// prisma/schema.prisma
 model PhotoCategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String    @unique
@@ -83,7 +87,8 @@ model PhotoCategory {
   description String?
   photos      Photo[]
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
+  updatedAt   DateTime  @updatedAt // Make updatedAt required
+
 }
 
 model Client {
@@ -91,14 +96,16 @@ model Client {
   title       String
   slug        String    @unique
   description String?
-  eventDate   DateTime
+  eventDate   DateTime  @default(now()) // Default value added
   imageUrl    String?
   youtubeUrl  String?
   photos      Photo[]
   categoryId  String    @db.ObjectId
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
+  updatedAt   DateTime  @updatedAt // Make updatedAt required
+
+  @@index([categoryId])
 }
 
 model Photo {
@@ -108,9 +115,9 @@ model Photo {
   clientId    String        @db.ObjectId
   client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
   categoryId  String        @db.ObjectId
-  category    PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Changed from Restrict to Cascade
+  category    PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime?     @updatedAt
+  updatedAt   DateTime      @updatedAt // Make updatedAt required
 
   @@index([clientId])
   @@index([categoryId])
