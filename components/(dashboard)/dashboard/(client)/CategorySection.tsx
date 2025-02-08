@@ -92,9 +92,9 @@ export function CategorySection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Photo Categories</h2>
+        <h2 className="text-xl lg:text-2xl font-semibold">Photo Categories</h2>
         <Button onClick={() => setIsAddingPhotoCategory(true)}>
-          Add Photo Category
+          Add Category
         </Button>
       </div>
 

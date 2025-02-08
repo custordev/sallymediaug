@@ -117,24 +117,30 @@ export function Footer() {
             © {new Date().getFullYear()} Sally Media Ug. All rights reserved.
           </p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <a
+            <Link
               href="login"
               className="text-gray-600 hover:text-amber-600 transition-colors"
             >
               Admin
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="text-gray-600 hover:text-amber-600 transition-colors"
             >
               Privacy Policy
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="text-gray-600 hover:text-amber-600 transition-colors"
             >
               Terms of Service
-            </a>
+            </Link>
+            <Link
+              href="https://custor-dev.vercel.app/"
+              className="text-gray-600 hover:text-amber-600 transition-colors"
+            >
+              Developer
+            </Link>
           </div>
         </div>
       </div>
