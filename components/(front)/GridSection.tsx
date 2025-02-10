@@ -57,18 +57,31 @@ export default function PhotoGallery({
     useState<NodeJS.Timeout | null>(null);
   const [slideshowDelay, setSlideshowDelay] = useState(3000);
 
+  // const categories = [
+  //   {
+  //     id: "all",
+  //     title: "All",
+  //     name: "All",
+  //     photos:
+  //       initialClient.photos?.map((photo) => ({
+  //         src: photo.url,
+  //         alt: photo.caption || "photo",
+  //       })) || [],
+  //     youtubeUrl: initialClient.youtubeUrl || null,
+  //   },
+  //   ...photoCategories.map((category) => ({
+  //     id: category.id,
+  //     title: category.title,
+  //     name: category.title,
+  //     photos: clientPhotos
+  //       .filter((photo) => photo.categoryId === category.id)
+  //       .map((photo) => ({
+  //         src: photo.url,
+  //         alt: photo.description || "photo",
+  //       })),
+  //   })),
+  // ];
   const categories = [
-    {
-      id: "all",
-      title: "All",
-      name: "All",
-      photos:
-        initialClient.photos?.map((photo) => ({
-          src: photo.url,
-          alt: photo.caption || "photo",
-        })) || [],
-      youtubeUrl: initialClient.youtubeUrl || null,
-    },
     ...photoCategories.map((category) => ({
       id: category.id,
       title: category.title,
@@ -79,9 +92,10 @@ export default function PhotoGallery({
           src: photo.url,
           alt: photo.description || "photo",
         })),
+      // Show YouTube video only if this is the "highlights" category
+      youtubeUrl: category.slug === "all" ? initialClient.youtubeUrl : null,
     })),
   ];
-
   const currentCategory =
     categories.find((cat) => cat.id === activeCategory) || categories[0];
   const photos = currentCategory.photos;
@@ -158,37 +172,6 @@ export default function PhotoGallery({
     setSelectedImage(photos[(currentImageIndex + 1) % photos.length].src);
   }, [photos, currentImageIndex]);
 
-  const handleDownload = useCallback(
-    (e: React.MouseEvent, src?: string) => {
-      e.stopPropagation();
-
-      if (!src) {
-        currentCategory.photos.forEach((photo) => {
-          const link = document.createElement("a");
-          link.href = photo.src;
-          const filename = photo.src.split("/").pop() || "image";
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        });
-        showAlertMessage("Downloading all photos from this category!");
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.href = src;
-      const filename = src.split("/").pop() || "image";
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      showAlertMessage("Download started!");
-    },
-    [currentCategory]
-  );
-
   const handleFavorite = useCallback(
     (e: React.MouseEvent, src?: string) => {
       e.stopPropagation();
@@ -227,6 +210,117 @@ export default function PhotoGallery({
         }
         return newFavorites;
       });
+    },
+    [currentCategory]
+  );
+
+  // const handleDownload = useCallback(
+  //   (e: React.MouseEvent, src?: string) => {
+  //     e.stopPropagation();
+
+  //     if (!src) {
+  //       currentCategory.photos.forEach((photo) => {
+  //         const link = document.createElement("a");
+  //         link.href = photo.src;
+  //         const filename = photo.src.split("/").pop() || "image";
+  //         link.download = filename;
+  //         document.body.appendChild(link);
+  //         link.click();
+  //         document.body.removeChild(link);
+  //       });
+  //       showAlertMessage("Downloading all photos from this category!");
+  //       return;
+  //     }
+
+  //     const link = document.createElement("a");
+  //     link.href = src;
+  //     const filename = src.split("/").pop() || "image";
+  //     link.download = filename;
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+
+  //     showAlertMessage("Download started!");
+  //   },
+  //   [currentCategory]
+  // );
+
+  // const handleShare = useCallback(
+  //   async (e: React.MouseEvent, src?: string) => {
+  //     e.stopPropagation();
+
+  //     try {
+  //       if (!src) {
+  //         const galleryUrl = window.location.href;
+  //         if (navigator.share) {
+  //           await navigator.share({
+  //             title: `${initialClient.name}'s Photo Gallery`,
+  //             text: `Check out ${initialClient.name}'s photo gallery`,
+  //             url: galleryUrl,
+  //           });
+  //           showAlertMessage("Shared gallery successfully!");
+  //         } else {
+  //           await navigator.clipboard.writeText(galleryUrl);
+  //           showAlertMessage("Gallery link copied to clipboard!");
+  //         }
+  //         return;
+  //       }
+
+  //       if (navigator.share) {
+  //         await navigator.share({
+  //           title: `Photo from ${initialClient.name}'s gallery`,
+  //           text: `Check out this photo from ${initialClient.name}'s gallery`,
+  //           url: src,
+  //         });
+  //         showAlertMessage("Shared successfully!");
+  //       } else {
+  //         await navigator.clipboard.writeText(src);
+  //         showAlertMessage("Link copied to clipboard!");
+  //       }
+  //     } catch (error) {
+  //       showAlertMessage("Error sharing image");
+  //     }
+  //   },
+  //   [initialClient]
+  // );
+
+  const handleDownload = useCallback(
+    (e: React.MouseEvent, src?: string) => {
+      e.stopPropagation();
+
+      if (!src) {
+        currentCategory.photos.forEach((photo) => {
+          fetch(photo.src)
+            .then((response) => response.blob())
+            .then((blob) => {
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              const filename = photo.src.split("/").pop() || "image";
+              link.download = filename;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(link.href);
+            });
+        });
+        showAlertMessage("Downloading all photos from this category!");
+        return;
+      }
+
+      fetch(src)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          const filename = src.split("/").pop() || "image";
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+        });
+
+      showAlertMessage("Download started!");
     },
     [currentCategory]
   );
@@ -309,12 +403,12 @@ export default function PhotoGallery({
 
       <section className="py-6">
         <div className="flex flex-col gap-4">
-          {activeCategory === "all" && initialClient.youtubeUrl && (
+          {currentCategory.youtubeUrl && (
             <div className="aspect-video w-full bg-gray-100 rounded-lg overflow-hidden">
               <iframe
                 width="100%"
                 height="100%"
-                src={`https://www.youtube.com/embed/${getYouTubeVideoId(initialClient.youtubeUrl)}`}
+                src={`https://www.youtube.com/embed/${getYouTubeVideoId(currentCategory.youtubeUrl)}`}
                 title="Highlights Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

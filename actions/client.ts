@@ -7,6 +7,18 @@ import { unstable_noStore as noStore } from "next/cache";
 import db from "@/prisma/db";
 import { z } from "zod";
 import type { ClientUpdateData } from "@/types/types";
+
+const ClientFormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().min(1, "Slug is required"),
+  description: z.string().optional(),
+  eventDate: z.string().or(z.date()),
+  imageUrl: z.string().url().optional(),
+  youtubeUrl: z.string().url().optional(),
+  categoryId: z.string().min(1, "Category is required"),
+  photoCategoryId: z.string().optional(),
+  galleryImages: z.array(z.string().url()).optional(),
+});
 interface ClientFormData {
   galleryImages?: string[];
   title: string;
@@ -118,52 +130,65 @@ export async function getClientById(
 export async function createClient(data: ClientFormData): Promise<ApiResponse> {
   noStore();
 
-  if (!data.title || !data.slug || !data.categoryId) {
-    return {
-      success: false,
-      error: "Missing required fields",
-      statusCode: 400,
-    };
-  }
-
   try {
+    // Validate input data
+    const validatedData = ClientFormSchema.parse(data);
+
     const result = await db.$transaction(async (prisma) => {
-      let defaultPhotoCategory = await prisma.photoCategory.findFirst({
-        where: { slug: "highlights" },
+      const client = await prisma.client.create({
+        data: {
+          title: validatedData.title,
+          slug: validatedData.slug,
+          description: validatedData.description || "",
+          eventDate: new Date(validatedData.eventDate),
+          imageUrl: validatedData.imageUrl || "",
+          youtubeUrl: validatedData.youtubeUrl?.trim() || null,
+          categoryId: validatedData.categoryId,
+        },
       });
 
-      if (!defaultPhotoCategory) {
-        defaultPhotoCategory = await prisma.photoCategory.create({
-          data: {
-            title: "HIGHLIGHTS",
-            slug: "highlights",
-            description: "Default category for all photos",
-          },
+      // Create a default "All" photo category for the client
+      const allCategory = await prisma.photoCategory.create({
+        data: {
+          title: "All",
+          slug: "all",
+          description: "All photos for this client",
+          clientId: client.id,
+        },
+      });
+
+      let selectedCategoryId = allCategory.id;
+
+      // If a photo category was selected and it exists, use it
+      if (validatedData.photoCategoryId) {
+        const existingCategory = await prisma.photoCategory.findUnique({
+          where: { id: validatedData.photoCategoryId },
+        });
+        if (existingCategory) {
+          selectedCategoryId = existingCategory.id;
+        }
+      }
+
+      // Create photos and associate them with the selected category
+      if (
+        validatedData.galleryImages &&
+        validatedData.galleryImages.length > 0
+      ) {
+        await prisma.photo.createMany({
+          data: validatedData.galleryImages.map((url) => ({
+            url,
+            clientId: client.id,
+            categoryId: selectedCategoryId,
+            description: "",
+          })),
         });
       }
 
-      const client = await prisma.client.create({
-        data: {
-          title: data.title,
-          slug: data.slug,
-          description: data.description || "",
-          eventDate: new Date(data.eventDate),
-          imageUrl: data.imageUrl || "",
-          youtubeUrl: data.youtubeUrl?.trim() || null,
-          categoryId: data.categoryId,
-          photos:
-            data.galleryImages && data.galleryImages.length > 0
-              ? {
-                  create: data.galleryImages.map((url) => ({
-                    url,
-                    categoryId: defaultPhotoCategory!.id,
-                    description: "",
-                  })),
-                }
-              : undefined,
-        },
+      return prisma.client.findUnique({
+        where: { id: client.id },
         include: {
           category: true,
+          categories: true,
           photos: {
             include: {
               category: true,
@@ -171,14 +196,16 @@ export async function createClient(data: ClientFormData): Promise<ApiResponse> {
           },
         },
       });
-
-      return client;
     });
+
+    if (!result) {
+      console.log("Failed to create client");
+    }
 
     revalidatePath("/dashboard/gallery");
     return { success: true, data: result, statusCode: 201 };
   } catch (error) {
-    console.error("Error creating client:", error);
+    console.log("Error creating client:", error);
     return {
       success: false,
       error:
@@ -190,7 +217,7 @@ export async function createClient(data: ClientFormData): Promise<ApiResponse> {
 
 export async function updateClientWithPhotos(
   id: string,
-  data: ClientUpdateData
+  data: ClientUpdateData & { photos?: PhotoWithCategory[] }
 ) {
   noStore();
 
@@ -203,19 +230,44 @@ export async function updateClientWithPhotos(
           eventDate: new Date(data.eventDate),
           description: data.description,
           youtubeUrl: data.youtubeUrl,
-          photos:
-            Array.isArray(data.photos) && data.photos.length > 0
-              ? {
-                  create: data.photos.map((photo) => ({
-                    url: photo.url,
-                    description: photo.description || "",
-                    categoryId: photo.categoryId,
-                  })),
-                }
-              : undefined,
         },
+      });
+
+      if (Array.isArray(data.photos) && data.photos.length > 0) {
+        for (const photo of data.photos) {
+          let category = await prisma.photoCategory.findFirst({
+            where: {
+              slug: photo.categoryId,
+              clientId: id,
+            },
+          });
+
+          if (!category) {
+            category = await prisma.photoCategory.create({
+              data: {
+                title: photo.categoryId,
+                slug: photo.categoryId,
+                clientId: id,
+              },
+            });
+          }
+
+          await prisma.photo.create({
+            data: {
+              url: photo.url,
+              description: photo.description || "",
+              clientId: id,
+              categoryId: category.id,
+            },
+          });
+        }
+      }
+
+      return prisma.client.findUnique({
+        where: { id },
         include: {
           category: true,
+          categories: true,
           photos: {
             include: {
               category: true,
@@ -223,8 +275,6 @@ export async function updateClientWithPhotos(
           },
         },
       });
-
-      return updatedClient;
     });
 
     revalidatePath(`/dashboard/gallery/${id}`);
@@ -232,7 +282,7 @@ export async function updateClientWithPhotos(
 
     return { success: true, data: result };
   } catch (error) {
-    console.error("Error updating client with photos:", error);
+    console.log("Error updating client with photos:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to update client",
@@ -254,13 +304,14 @@ export async function createClientPhotoCategory(data: {
         title: data.title,
         slug: data.slug,
         description: data.description,
+        clientId: data.clientId,
       },
     });
 
     revalidatePath(`/dashboard/gallery/${data.clientId}`);
     return { success: true, data: category };
   } catch (error) {
-    console.error("Error creating client photo category:", error);
+    console.log("Error creating client photo category:", error);
     return {
       success: false,
       error:
@@ -293,7 +344,7 @@ export async function getClientPhotosByCategory(clientId: string) {
 
     return { success: true, data: Object.values(photosByCategory) };
   } catch (error) {
-    console.error("Error fetching client photos by category:", error);
+    console.log("Error fetching client photos by category:", error);
     return { success: false, error: "Failed to fetch photos" };
   }
 }
@@ -331,42 +382,33 @@ export async function getAllClients() {
 }
 
 export async function deleteClient(id: string) {
-  noStore();
+  noStore()
 
   try {
     const result = await db.$transaction(async (prisma) => {
-      await prisma.photo.deleteMany({ where: { clientId: id } });
-      const deletedClient = await prisma.client.delete({ where: { id } });
+      // First, delete all photos associated with the client
+      await prisma.photo.deleteMany({ where: { clientId: id } })
 
-      const emptyCategories = await prisma.photoCategory.findMany({
-        where: { photos: { none: {} } },
-      });
+      // Then, delete all photo categories associated with the client
+      await prisma.photoCategory.deleteMany({ where: { clientId: id } })
 
-      if (emptyCategories.length > 0) {
-        await prisma.photoCategory.deleteMany({
-          where: {
-            id: {
-              in: emptyCategories
-                .filter((cat) => !["all", "uncategorized"].includes(cat.slug))
-                .map((cat) => cat.id),
-            },
-          },
-        });
-      }
+      // Finally, delete the client
+      const deletedClient = await prisma.client.delete({ where: { id } })
 
-      return deletedClient;
-    });
+      return deletedClient
+    })
 
-    revalidatePath("/dashboard/gallery");
-    return { ok: true, data: result };
+    revalidatePath("/dashboard/gallery")
+    return { ok: true, data: result }
   } catch (error) {
-    console.error("Error deleting client:", error);
+    console.error("Error deleting client:", error instanceof Error ? error.message : "Unknown error")
     return {
       ok: false,
       error: error instanceof Error ? error.message : "Failed to delete client",
-    };
+    }
   }
 }
+
 
 export async function updateClientById(id: string, data: ClientUpdateData) {
   noStore();

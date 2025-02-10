@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import type { Photo, Client, PhotoCategory } from "@/types/types";
 import { createPhoto, deletePhoto } from "@/actions/photos";
 import { PhotoCard } from "./PhotoCard";
-
 import { getPhotoCategories } from "@/actions/photoCategory";
 import { Button } from "@/components/ui/button";
 import MultipleImageInput from "@/components/(forms)/MultipleImageInputDs";
@@ -27,13 +26,20 @@ export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const result = await getPhotoCategories();
-      if (result.success) {
-        setPhotoCategories(result.data as PhotoCategory[]);
+      if (client?.id) {
+        // Only fetch categories for this client
+        const result = await getPhotoCategories(String(client.id));
+        if (result.success) {
+          setPhotoCategories(result.data as PhotoCategory[]);
+          // If categories exist, set the first one as default
+          if (result.data?.length > 0) {
+            setSelectedCategoryId(result.data[0].id);
+          }
+        }
       }
     };
     fetchCategories();
-  }, []);
+  }, [client?.id]);
 
   const handleImageSelection = (urls: string[]) => {
     setSelectedImages(urls);
@@ -64,7 +70,9 @@ export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
       const successfulUploads = results.filter((result) => result.success);
 
       if (successfulUploads.length > 0) {
-        const newPhotos = successfulUploads.map((result) => result.data as unknown as Photo);
+        const newPhotos = successfulUploads.map(
+          (result) => result.data as unknown as Photo
+        );
         setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos] as Photo[]);
         setSelectedImages([]);
         toast.success(
@@ -96,10 +104,14 @@ export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
     activeCategory === "All"
       ? photos
       : photos.filter((photo) => {
-          if (typeof photo.category === 'string') {
+          if (typeof photo.category === "string") {
             return photo.category === activeCategory;
           }
-          return photo.category && typeof photo.category !== 'string' && (photo.category as PhotoCategory).title === activeCategory;
+          return (
+            photo.category &&
+            typeof photo.category !== "string" &&
+            (photo.category as PhotoCategory).title === activeCategory
+          );
         });
 
   return (
@@ -109,12 +121,17 @@ export function PhotoGrid({ client, activeCategory }: PhotoGridProps) {
         imageUrls={selectedImages}
         setImageUrls={handleImageSelection}
         categoryImage="categoryImage"
-        photoCategories={photoCategories}
+        photoCategories={photoCategories} // Pass only the fetched categories
         selectedCategoryId={selectedCategoryId}
         onCategoryChange={setSelectedCategoryId}
-        disabled={uploading}
+        disabled={uploading || photoCategories.length === 0}
       />
-      <Button onClick={handlePhotoUpload} disabled={uploading}>
+      <Button
+        onClick={handlePhotoUpload}
+        disabled={
+          uploading || !selectedCategoryId || selectedImages.length === 0
+        }
+      >
         {uploading ? "Uploading..." : "Save Images"}
       </Button>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">

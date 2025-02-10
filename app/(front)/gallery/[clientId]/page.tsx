@@ -1,23 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// app/(front)/gallery/[clientId]/page.tsx
 import HeroSection from "@/components/(front)/heroSection";
 import PhotoGallery from "@/components/(front)/GridSection";
 import { getClientById } from "@/actions/client";
-// import { getPhotoCategories } from "@/actions/photoCategories";
 import { getClientPhotos } from "@/actions/photos";
 import { getPhotoCategories } from "@/actions/photoCategory";
 
-export default async function GalleryDetail({
-  params,
-}: {
-  params: { clientId: string };
-}) {
-  const clientId = params.clientId;
-  const fetchedClient = await getClientById(clientId);
-  const photoCategories = await getPhotoCategories();
-  const clientPhotos = await getClientPhotos(clientId);
+interface PageParams {
+  params: {
+    category?: string;
+    clientId: string;
+  };
+}
+
+export default async function GalleryDetail({ params }: PageParams) {
+  const { clientId } = params;
+
+  // Fetch all data in parallel for better performance
+  const [fetchedClient, photoCategories, clientPhotos] = await Promise.all([
+    getClientById(clientId),
+    getPhotoCategories(clientId), // Pass the clientId here
+    getClientPhotos(clientId),
+  ]);
 
   if (!fetchedClient) {
     return <div>Client not found</div>;
+  }
+
+  // Check if we have successful responses
+  if (!photoCategories.success || !clientPhotos.success) {
+    return <div>Error loading gallery data</div>;
   }
 
   return (
@@ -26,13 +38,11 @@ export default async function GalleryDetail({
         <div className="mb-16">
           <HeroSection initialClient={fetchedClient} />
         </div>
-        {fetchedClient && (
-          <PhotoGallery
-            initialClient={fetchedClient as any}
-            photoCategories={photoCategories.data as any}
-            clientPhotos={clientPhotos.data as any}
-          />
-        )}
+        <PhotoGallery
+          initialClient={fetchedClient as any}
+          photoCategories={photoCategories.data}
+          clientPhotos={clientPhotos.data as any}
+        />
       </div>
     </section>
   );

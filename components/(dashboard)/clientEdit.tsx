@@ -3,9 +3,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, JSX } from "react";
+import { useState, useEffect, type JSX } from "react";
 import toast from "react-hot-toast";
-import { Category, Client, PhotoCategory } from "@prisma/client";
+import type { Category, Client, PhotoCategory } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { generateSlug } from "@/lib/generateSlug";
 import { createClient, updateClientById } from "@/actions/client";
@@ -13,12 +13,12 @@ import ImageInput from "../(formInputs)/ImageInput";
 import TextArea from "../(formInputs)/TextAreaInput";
 import TextInput from "../(formInputs)/TextInput";
 import FormHeader from "../(forms)/FormHeader";
-
 import MultipleImageInput from "../(forms)/MultipleImageInput";
 import FormFooter from "../(forms)/FormFooter";
 import { Popup } from "./popupcat";
 import { AddEventCategoryForm } from "./AddPhotoscategory";
 import FormSelectInput from "../(forms)/ShadSelectInput";
+import { getPhotoCategories } from "@/actions/photoCategory";
 
 interface ExtendedClient extends Client {
   eventCategories?: PhotoCategory[];
@@ -29,7 +29,7 @@ interface ClientFormProps {
   editingId?: string;
   initialData?: ExtendedClient | null;
   categories: Category[] | null;
-  eventCategories?: PhotoCategory[] | null;
+  // eventCategories?: PhotoCategory[] | null // Removed as it's now fetched dynamically
   photoCategories?: PhotoCategory[] | null;
 }
 
@@ -42,7 +42,6 @@ interface FormInputs {
 
 export default function ClientEditForm({
   categories,
-  photoCategories,
   editingId,
   initialData,
 }: ClientFormProps): JSX.Element {
@@ -56,22 +55,14 @@ export default function ClientEditForm({
 
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [photoCategories, setPhotoCategories] = useState<PhotoCategory[]>([]);
 
-  // Transform categories for FormSelectInput
   const categoryOptions =
     categories?.map((category) => ({
       value: category.id,
       label: category.title,
     })) || [];
 
-  // Transform photoCategories for FormSelectInput
-  const photoCategoryOptions =
-    photoCategories?.map((category) => ({
-      value: category.id,
-      label: category.title,
-    })) || [];
-
-  // Initialize selected categories with new approach
   const initialCategoryId = initialData?.categoryId;
   const initialCategory = categoryOptions.find(
     (item) => item.value === initialCategoryId
@@ -108,21 +99,39 @@ export default function ClientEditForm({
     }
   }, [initialData, setValue]);
 
+  useEffect(() => {
+    async function fetchPhotoCategories() {
+      if (editingId) {
+        const result = await getPhotoCategories(editingId);
+        if (result.success) {
+          setPhotoCategories(result.data);
+        } else {
+          toast.error("Failed to fetch photo categories");
+        }
+      } else {
+        // If we're creating a new client, we don't have photo categories yet
+        setPhotoCategories([]);
+      }
+    }
+
+    fetchPhotoCategories();
+  }, [editingId]);
+
   const validateForm = () => {
     if (!selectedCategory) {
       toast.error("Please select a category");
       return false;
     }
 
-    if (!selectedPhotoCategory) {
-      toast.error("Please select at least one photo category");
-      return false;
-    }
-
     return true;
   };
 
-  const handlePhotoCategoryAdd = () => {
+  const handlePhotoCategoryAdd = async (newCategory: PhotoCategory) => {
+    setPhotoCategories([...photoCategories, newCategory]);
+    setSelectedPhotoCategory({
+      value: newCategory.id,
+      label: newCategory.title,
+    });
     setIsPhotoCategoryPopupOpen(false);
   };
 
@@ -137,13 +146,19 @@ export default function ClientEditForm({
         eventDate: data.eventDate,
         youtubeUrl: data.youtubeUrl || undefined,
         categoryId: selectedCategory.value,
+        photoCategoryId: selectedPhotoCategory
+          ? selectedPhotoCategory.value
+          : undefined,
         imageUrl: imageUrl !== "/placeholder.svg" ? imageUrl : undefined,
         galleryImages,
         slug: generateSlug(data.title),
       };
 
       if (editingId) {
-        const result = await updateClientById(editingId, clientData);
+        const result = await updateClientById(editingId, {
+          ...clientData,
+          photos: true,
+        });
         if (result) {
           toast.success("Client updated successfully!");
           router.push(`/dashboard/categories`);
@@ -235,13 +250,6 @@ export default function ClientEditForm({
                           toolTipText="Add New Category"
                           href="/dashboard/categories/new"
                         />
-                        {/* <Button
-                          onClick={() =>
-                            router.push("/dashboard/categories/new")
-                          }
-                        >
-                          Add Category
-                        </Button> */}
                       </div>
                     </CardContent>
                   </Card>
@@ -251,8 +259,11 @@ export default function ClientEditForm({
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3">
                       <FormSelectInput
-                        label="Photo Categories"
-                        options={photoCategoryOptions}
+                        label="Photo Categories (Optional)"
+                        options={photoCategories.map((cat) => ({
+                          value: cat.id,
+                          label: cat.title,
+                        }))}
                         option={selectedPhotoCategory}
                         setOption={setSelectedPhotoCategory}
                         toolTipText="Add New Photo Category"
@@ -298,7 +309,10 @@ export default function ClientEditForm({
         onClose={() => setIsPhotoCategoryPopupOpen(false)}
         title="Add Photo Category"
       >
-        <AddEventCategoryForm onSuccess={handlePhotoCategoryAdd} />
+        <AddEventCategoryForm
+          onSuccess={handlePhotoCategoryAdd}
+          clientId={editingId || ""} // Use editingId or an empty string if not available
+        />
       </Popup>
     </form>
   );

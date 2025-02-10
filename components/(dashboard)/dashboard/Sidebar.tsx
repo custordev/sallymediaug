@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
   Calendar,
   Users,
   ImageIcon,
@@ -12,16 +11,19 @@ import {
   Settings,
   LogOut,
   HelpCircle,
+  AirVent,
+  Home,
 } from "lucide-react";
 import Logo from "@/components/(global)/Logo";
 
 const sidebarLinks = [
-  { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+  { name: "Dashboard", icon: AirVent, href: "/" },
   { name: "Bookings", icon: Calendar, href: "/dashboard/bookings" },
   { name: "Clients", icon: Users, href: "/dashboard/clients" },
   { name: "Categories", icon: ImageIcon, href: "/dashboard/categories" },
   { name: "Analytics", icon: LineChart, href: "/dashboard/analytics" },
   { name: "Settings", icon: Settings, href: "/dashboard/settings" },
+  { name: "Live App", icon: Home, href: "/" },
 ];
 
 export function Sidebar() {

@@ -44,13 +44,16 @@ export function CategorySection({
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const result = await getPhotoCategories();
-      if (result.success) {
-        setCategories(result.data as any);
+      if (client?.id) {
+        // Only fetch if we have a client ID
+        const result = await getPhotoCategories(client.id);
+        if (result.success) {
+          setCategories(result.data as any);
+        }
       }
     };
     fetchCategories();
-  }, []);
+  }, [client?.id]);
 
   const handleAddPhotoCategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +71,7 @@ export function CategorySection({
         title: newCategory.trim(),
         slug,
         description: description.trim(),
+        clientId: client.id,
       });
 
       if (result.success) {
@@ -99,12 +103,12 @@ export function CategorySection({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button
+        {/* <Button
           onClick={() => setActiveCategory("All")}
           variant={activeCategory === "All" ? "default" : "outline"}
         >
           All
-        </Button>
+        </Button> */}
         {categories.map((category) => (
           <Button
             key={category.id}

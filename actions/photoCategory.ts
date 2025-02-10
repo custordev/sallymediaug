@@ -1,125 +1,141 @@
-"use server"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use server";
 
-import { revalidatePath } from "next/cache"
-import { unstable_noStore as noStore } from "next/cache"
-import db from "@/prisma/db"
-import { z } from "zod"
+import db from "@/prisma/db";
+import { revalidatePath } from "next/cache";
+import { unstable_noStore as noStore } from "next/cache";
 
-const PhotoCategorySchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  description: z.string().optional(),
-})
+type ApiResponse = {
+  success: boolean;
+  data?: any;
+  error?: string;
+  statusCode: number;
+};
 
-export async function createPhotoCategory(data: z.infer<typeof PhotoCategorySchema>) {
-  noStore()
-
+export async function getPhotoCategories(
+  clientId?: string
+): Promise<ApiResponse> {
+  noStore();
   try {
-    const validatedData = PhotoCategorySchema.parse(data)
-
-    const existing = await db.photoCategory.findFirst({
-      where: {
-        OR: [{ title: validatedData.title }, { slug: validatedData.slug }],
-      },
-    })
-
-    if (existing) {
+    // Only query if clientId is provided
+    if (!clientId) {
       return {
-        success: false,
-        error: `Category with this ${existing.title === validatedData.title ? "title" : "slug"} already exists`,
-      }
+        success: true,
+        data: [],
+        statusCode: 200,
+      };
     }
 
-    const category = await db.photoCategory.create({
-      data: validatedData,
-    })
+    const categories = await db.photoCategory.findMany({
+      where: { clientId },
+      orderBy: { title: "asc" },
+    });
 
-    revalidatePath("/dashboard/categories")
-    return { success: true, data: category }
+    return {
+      success: true,
+      data: categories,
+      statusCode: 200,
+    };
   } catch (error) {
-    console.error("Error creating category:", error)
+    console.error("Error fetching photo categories:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create category",
-    }
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      statusCode: 500,
+    };
   }
 }
 
-export async function updatePhotoCategory(categoryId: string, data: z.infer<typeof PhotoCategorySchema>) {
-  noStore()
+export async function createPhotoCategory(data: {
+  title: string;
+  slug: string;
+  description?: string;
+  clientId: string;
+}) {
+  if (!data.clientId) {
+    return {
+      success: false,
+      error: "Client ID is required",
+    };
+  }
 
   try {
-    const validatedData = PhotoCategorySchema.partial().parse(data)
+    const category = await db.photoCategory.create({
+      data: {
+        title: data.title,
+        slug: data.slug,
+        description: data.description || "",
+        clientId: data.clientId,
+      },
+    });
 
+    revalidatePath("/dashboard/categories");
+    return { success: true, data: category };
+  } catch (error) {
+    console.error("Error creating category:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create category",
+    };
+  }
+}
+
+export async function updatePhotoCategory(
+  categoryId: string,
+  data: { title?: string; slug?: string; description?: string }
+) {
+  try {
     const category = await db.photoCategory.update({
       where: { id: categoryId },
-      data: validatedData,
-    })
+      data,
+    });
 
-    revalidatePath("/dashboard/categories")
-    return { success: true, data: category }
+    revalidatePath("/dashboard/categories");
+    return { success: true, data: category };
   } catch (error) {
-    console.error("Error updating category:", error)
-    return { success: false, error: "Failed to update category" }
+    console.error("Error updating category:", error);
+    return { success: false, error: "Failed to update category" };
   }
 }
 
 export async function deletePhotoCategory(categoryId: string) {
-  noStore()
-
   try {
     await db.photoCategory.delete({
       where: { id: categoryId },
-    })
+    });
 
-    revalidatePath("/dashboard/categories")
-    return { success: true }
+    revalidatePath("/dashboard/categories");
+    return { success: true };
   } catch (error) {
-    console.error("Error deleting category:", error)
-    return { success: false, error: "Failed to delete category" }
-  }
-}
-
-export async function getPhotoCategories() {
-  noStore()
-
-  try {
-    const categories = await db.photoCategory.findMany({
-      orderBy: { title: "asc" },
-    })
-    return { success: true, data: categories }
-  } catch (error) {
-    console.error("Error fetching categories:", error)
-    return { success: false, error: "Failed to fetch categories" }
+    console.error("Error deleting category:", error);
+    return { success: false, error: "Failed to delete category" };
   }
 }
 
 export async function getPhotoCategoryById(categoryId: string) {
-  noStore()
-
   try {
     const category = await db.photoCategory.findUnique({
       where: { id: categoryId },
-    })
+    });
 
     if (!category) {
-      return { success: false, error: "Category not found" }
+      return { success: false, error: "Category not found" };
     }
 
-    return { success: true, data: category }
+    return { success: true, data: category };
   } catch (error) {
-    console.error("Error fetching category by ID:", error)
-    return { success: false, error: "Failed to fetch category" }
+    console.error("Error fetching category by ID:", error);
+    return { success: false, error: "Failed to fetch category" };
   }
 }
 
-export async function ensureDefaultPhotoCategory() {
-  noStore()
-
+export async function ensureDefaultPhotoCategory(clientId: string) {
   try {
     let defaultCategory = await db.photoCategory.findFirst({
-      where: { slug: "uncategorized" },
-    })
+      where: { slug: "uncategorized", clientId: clientId },
+    });
 
     if (!defaultCategory) {
       defaultCategory = await db.photoCategory.create({
@@ -127,14 +143,14 @@ export async function ensureDefaultPhotoCategory() {
           title: "Uncategorized",
           slug: "uncategorized",
           description: "Default category for uncategorized photos",
+          clientId: clientId,
         },
-      })
+      });
     }
 
-    return defaultCategory
+    return defaultCategory;
   } catch (error) {
-    console.error("Error ensuring default category:", error)
-    throw error
+    console.error("Error ensuring default category:", error);
+    throw error;
   }
 }
-

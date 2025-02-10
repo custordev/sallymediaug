@@ -6,34 +6,11 @@ import { CategoryProps } from "@/types/types";
 
 import { revalidatePath } from "next/cache";
 
-// export async function createCategory(data: CategoryProps) {
-//   const slug = data.slug;
-//   try {
-//     const existingCategory = await db.category.findUnique({
-//       where: {
-//         slug,
-//       },
-//     });
-//     if (existingCategory) {
-//       return existingCategory;
-//     }
-//     const newCategory = await db.category.create({
-//       data,
-//     });
-//     // console.log(newCategory);
-//     revalidatePath("/dashboard/categories");
-//     return newCategory;
-//   } catch (error) {
-//     console.log(error);
-//     return null;
-//   }
-// }
-
 export async function createCategory(data: CategoryProps) {
   try {
     // Validate required fields explicitly
     if (!data.title) {
-      console.error("Title is required");
+      console.log("Title is required");
       return null;
     }
 
@@ -52,9 +29,9 @@ export async function createCategory(data: CategoryProps) {
 
     return newCategory;
   } catch (error) {
-    console.error("Category Creation Error:", error);
+    console.log("Category Creation Error:", error);
     // Throw the error to get more details
-    throw error;
+    // throw error;
   }
 }
 
@@ -123,25 +100,3 @@ export async function createBulkCategories(categories: CategoryProps[]) {
     console.log(error);
   }
 }
-// export async function createCategory(data: CategoryProps) {
-//   const slug = data.slug;
-//   try {
-//     const existingCategory = await db.category.findUnique({
-//       where: {
-//         slug,
-//       },
-//     });
-//     if (existingCategory) {
-//       return existingCategory;
-//     }
-//     const newCategory = await db.category.create({
-//       data,
-//     });
-//     // console.log(newCategory);
-//     revalidatePath("/dashboard/categories");
-//     return newCategory;
-//   } catch (error) {
-//     console.log(error);
-//     return null;
-//   }
-// }

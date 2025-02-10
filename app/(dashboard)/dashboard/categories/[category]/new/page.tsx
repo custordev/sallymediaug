@@ -24,7 +24,7 @@ export default async function ClientPage({ params }: PageProps) {
   const [client, categories, photoCategoriesResult] = (await Promise.all([
     getClientById(clientId),
     getAllCategories(),
-    getPhotoCategories(),
+    getPhotoCategories(clientId),
   ])) as [Client | null, Category[] | null, PhotoCategoriesResponse];
 
   const PhotoCategories = photoCategoriesResult.success

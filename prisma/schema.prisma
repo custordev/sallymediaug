@@ -77,35 +77,88 @@ model Category {
 }
 
 
+// model Client {
+//   id          String         @id @default(auto()) @map("_id") @db.ObjectId
+//   title       String
+//   slug        String         @unique
+//   description String?
+//   eventDate   DateTime       @default(now())
+//   imageUrl    String?
+//   youtubeUrl  String?
+//   photos      Photo[]
+//   categories  PhotoCategory[]
+//   categoryId  String         @db.ObjectId
+//   category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   createdAt   DateTime       @default(now())
+//   updatedAt   DateTime       @updatedAt
 
+//   @@index([categoryId])
+// }
 
-// prisma/schema.prisma
-model PhotoCategory {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  title       String    @unique
-  slug        String    @unique
-  description String?
-  photos      Photo[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt // Make updatedAt required
+// model PhotoCategory {
+//   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+//   title       String   
+//   slug        String   
+//   description String?
+//   photos      Photo[]
+//   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+//   clientId    String   @db.ObjectId
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
 
-}
+//   @@unique([title, clientId])
+//   @@unique([slug, clientId])
+//   @@index([clientId])
+// }
+
+// model Photo {
+//   id          String        @id @default(auto()) @map("_id") @db.ObjectId
+//   url         String
+//   description String?
+//   clientId    String        @db.ObjectId
+//   client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+//   categoryId  String        @db.ObjectId
+//   category    PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   createdAt   DateTime      @default(now())
+//   updatedAt   DateTime      @updatedAt
+
+//   @@index([clientId])
+//   @@index([categoryId])
+// }
+
 
 model Client {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  slug        String    @unique
+  slug        String         @unique
   description String?
-  eventDate   DateTime  @default(now()) // Default value added
+  eventDate   DateTime       @default(now())
   imageUrl    String?
   youtubeUrl  String?
   photos      Photo[]
-  categoryId  String    @db.ObjectId
-  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt // Make updatedAt required
+  categories  PhotoCategory[]
+  categoryId  String         @db.ObjectId
+  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   @@index([categoryId])
+}
+
+model PhotoCategory {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String   
+  slug        String   
+  description String?
+  photos      Photo[]
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId    String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([title, clientId])
+  @@unique([slug, clientId])
+  @@index([clientId])
 }
 
 model Photo {
@@ -117,8 +170,9 @@ model Photo {
   categoryId  String        @db.ObjectId
   category    PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt // Make updatedAt required
+  updatedAt   DateTime      @updatedAt
 
   @@index([clientId])
   @@index([categoryId])
 }
+

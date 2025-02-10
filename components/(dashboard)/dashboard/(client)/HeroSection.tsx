@@ -8,7 +8,6 @@ import { Calendar } from "lucide-react";
 import { EditHeroDialog } from "./EditHeroDialog";
 import { formatDate } from "@/lib/formatDate";
 
-
 export function HeroSection({ client, setClient }: any) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,8 +33,8 @@ export function HeroSection({ client, setClient }: any) {
     <div className="relative rounded-xl overflow-hidden shadow-xl">
       <div className="relative h-[300px] md:h-[400px]">
         <Image
-          src={client.imageUrl || "/placeholder.svg"}
-          alt={client.title}
+          src={client?.imageUrl || "/placeholder.svg"}
+          alt={client?.title}
           fill
           className="object-cover"
         />
@@ -44,14 +43,16 @@ export function HeroSection({ client, setClient }: any) {
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 text-white">
           <div className="flex justify-between items-end">
             <div className="space-y-2">
-              <h1 className="text-2xl md:text-4xl font-bold">{client.title}</h1>
+              <h1 className="text-2xl md:text-4xl font-bold">
+                {client?.title}
+              </h1>
               <div className="flex items-center text-white mb-2">
                 <Calendar className="w-4 h-4 mr-2" />
-                <span>{formatDate(client.eventDate)}</span>
+                <span>{formatDate(client?.eventDate)}</span>
               </div>
-              {client.description && (
+              {client?.description && (
                 <p className="text-sm md:text-base text-white/80 line-clamp-2 md:line-clamp-none">
-                  {client.description}
+                  {client?.description}
                 </p>
               )}
             </div>
