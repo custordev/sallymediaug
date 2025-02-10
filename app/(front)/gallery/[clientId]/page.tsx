@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // app/(front)/gallery/[clientId]/page.tsx
 import HeroSection from "@/components/(front)/heroSection";
@@ -13,8 +14,12 @@ interface PageParams {
   };
 }
 
-export default async function GalleryDetail({ params }: PageParams) {
-  const { clientId } = params;
+export default async function GalleryDetail({
+  params,
+}: {
+  params: Promise<{ category: string; clientId: string }>;
+}) {
+  const clientId = (await params).clientId;
 
   // Fetch all data in parallel for better performance
   const [fetchedClient, photoCategories, clientPhotos] = await Promise.all([
