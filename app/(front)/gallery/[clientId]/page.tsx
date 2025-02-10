@@ -1,15 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import HeroSection from "@/components/(front)/heroSection";
-import PhotoGallery, { Client } from "@/components/(front)/GridSection";
-import { getClientById,  } from "@/actions/client";
+import PhotoGallery from "@/components/(front)/GridSection";
+import { getClientById } from "@/actions/client";
+// import { getPhotoCategories } from "@/actions/photoCategories";
+import { getClientPhotos } from "@/actions/photos";
+import { getPhotoCategories } from "@/actions/photoCategory";
 
 export default async function GalleryDetail({
   params,
 }: {
-  params: Promise<{ category: string; clientId: string }>;
+  params: { clientId: string };
 }) {
-  const clientId = (await params).clientId;
-  const fetchedClient = (await getClientById(clientId)) as unknown as Client;
-  // console.log(fetchedClient);
+  const clientId = params.clientId;
+  const fetchedClient = await getClientById(clientId);
+  const photoCategories = await getPhotoCategories();
+  const clientPhotos = await getClientPhotos(clientId);
+
+  if (!fetchedClient) {
+    return <div>Client not found</div>;
+  }
 
   return (
     <section className="py-16 bg-gradient-to-b from-amber-50 to-white min-h-screen">
@@ -17,7 +26,13 @@ export default async function GalleryDetail({
         <div className="mb-16">
           <HeroSection initialClient={fetchedClient} />
         </div>
-        {fetchedClient && <PhotoGallery initialClient={fetchedClient} />}
+        {fetchedClient && (
+          <PhotoGallery
+            initialClient={fetchedClient as any}
+            photoCategories={photoCategories.data as any}
+            clientPhotos={clientPhotos.data as any}
+          />
+        )}
       </div>
     </section>
   );

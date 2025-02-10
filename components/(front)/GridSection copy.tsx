@@ -10,29 +10,9 @@ import { PhotoGrid } from "./photoGrid";
 import { FullscreenView } from "./fullScreenView";
 
 export interface Client {
-  id: string;
-  name: string;
   photos?: { url: string; caption?: string }[];
   youtubeUrl?: string;
-}
-
-interface PhotoCategory {
-  id: string;
-  title: string;
-  slug: string;
-}
-
-interface Photo {
-  id: string;
-  url: string;
-  description?: string;
-  categoryId: string;
-}
-
-interface PhotoGalleryProps {
-  initialClient: Client;
-  photoCategories: PhotoCategory[];
-  clientPhotos: Photo[];
+  name: string;
 }
 
 function getYouTubeVideoId(url: string): string | null {
@@ -44,9 +24,9 @@ function getYouTubeVideoId(url: string): string | null {
 
 export default function PhotoGallery({
   initialClient,
-  photoCategories,
-  clientPhotos,
-}: PhotoGalleryProps) {
+}: {
+  initialClient: Client;
+}) {
   const [activeCategory, setActiveCategory] = useState("highlights");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -57,44 +37,42 @@ export default function PhotoGallery({
     useState<NodeJS.Timeout | null>(null);
   const [slideshowDelay, setSlideshowDelay] = useState(3000);
 
+  // Transform client data into categories format
   const categories = [
     {
-      id: "all",
-      title: "All",
-      name: "All",
+      id: "highlights",
+      title: "Highlights",
+      name: "Highlights",
       photos:
         initialClient.photos?.map((photo) => ({
           src: photo.url,
-          alt: photo.caption || "photo",
+          alt: photo.caption || " photo",
         })) || [],
       youtubeUrl: initialClient.youtubeUrl || null,
     },
-    ...photoCategories.map((category) => ({
-      id: category.id,
-      title: category.title,
-      name: category.title,
-      photos: clientPhotos
-        .filter((photo) => photo.categoryId === category.id)
-        .map((photo) => ({
-          src: photo.url,
-          alt: photo.description || "photo",
-        })),
-    })),
+    // Add more categories if needed based on your data structure
   ];
 
   const currentCategory =
     categories.find((cat) => cat.id === activeCategory) || categories[0];
   const photos = currentCategory.photos;
 
-  // const videoId = getYouTubeVideoId(currentCategory.youtubeUrl || "")
-  const videoId = initialClient.youtubeUrl
-    ? getYouTubeVideoId(initialClient.youtubeUrl)
-    : null;
+  useEffect(() => {
+    return () => {
+      if (slideshowInterval) {
+        clearInterval(slideshowInterval);
+      }
+    };
+  }, [slideshowInterval]);
 
   const showAlertMessage = (message: string) => {
     setShowAlert({ show: true, message });
     setTimeout(() => setShowAlert({ show: false, message: "" }), 3000);
   };
+
+  const videoId = initialClient.youtubeUrl
+    ? getYouTubeVideoId(initialClient.youtubeUrl)
+    : null;
 
   const handleSlideshow = useCallback(
     (e?: React.MouseEvent) => {
@@ -270,14 +248,6 @@ export default function PhotoGallery({
     [initialClient]
   );
 
-  useEffect(() => {
-    return () => {
-      if (slideshowInterval) {
-        clearInterval(slideshowInterval);
-      }
-    };
-  }, [slideshowInterval]);
-
   return (
     <div className="w-full max-w-[1800px] mx-auto px-4">
       {showAlert.show && (
@@ -287,7 +257,7 @@ export default function PhotoGallery({
       )}
 
       <Header
-        initialClient={initialClient as any}
+      initialClient={initialClient as any}
         activeCategory={activeCategory}
         categories={categories as any}
         setActiveCategory={setActiveCategory}
@@ -309,12 +279,12 @@ export default function PhotoGallery({
 
       <section className="py-6">
         <div className="flex flex-col gap-4">
-          {activeCategory === "all" && initialClient.youtubeUrl && (
+          {activeCategory === "highlights" && videoId && (
             <div className="aspect-video w-full bg-gray-100 rounded-lg overflow-hidden">
               <iframe
                 width="100%"
                 height="100%"
-                src={`https://www.youtube.com/embed/${getYouTubeVideoId(initialClient.youtubeUrl)}`}
+                src={`https://www.youtube.com/embed/${videoId}`}
                 title="Highlights Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -30,4 +30,3 @@ export function CategoryNav({ categories, activeCategory, setActiveCategory }: C
     </nav>
   );
 }
-

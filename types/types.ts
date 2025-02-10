@@ -3691,6 +3691,11 @@ export function formatTime(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
+export interface Photo {
+  id: string;
+  src: string;
+  alt?: string;
+}
 export type workProps = {
   id: number;
   img: string;
@@ -3732,6 +3737,10 @@ export type CategoryProps = {
 };
 
 export type ClientUpdateData = {
+  photos: boolean;
+  slug: any;
+  imageUrl: any;
+  categoryId: any;
   title: string;
   eventDate: string;
   description?: string;

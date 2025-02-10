@@ -1,16 +1,15 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Heart, Download, Share2 } from 'lucide-react';
+import { Heart, Download, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Photo } from "@/types/types";
-
 
 interface PhotoGridProps {
   photos: Photo[];
   handleImageClick: (src: string, index: number) => void;
-  handleFavorite: (e: React.MouseEvent, src: string) => void;
-  handleDownload: (e: React.MouseEvent, src: string) => void;
-  handleShare: (e: React.MouseEvent, src: string) => void;
+  handleFavorite: (e: React.MouseEvent, src?: string) => void;
+  handleDownload: (e: React.MouseEvent, src?: string) => void;
+  handleShare: (e: React.MouseEvent, src?: string) => void;
   favorites: Set<string>;
 }
 
@@ -74,4 +73,3 @@ export function PhotoGrid({
     </div>
   );
 }
-

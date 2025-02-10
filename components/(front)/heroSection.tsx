@@ -25,7 +25,7 @@ export default function HeroSection({
         {/* Background image */}
         <Image
           src={initialClient?.imageUrl || ""}
-          alt="Wedding Photo"
+          alt="Client Photo"
           fill
           className="object-cover"
           priority
@@ -43,10 +43,10 @@ export default function HeroSection({
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          <h1 className="text-4xl uppercase md:text-7xl font-light tracking-wider transition-all duration-500">
+          <h1 className="text-4xl uppercase md:text-7xl font-light tracking-wide transition-all duration-500">
             {initialClient?.title}
           </h1>
-          <p className="md:text-xl text-md tracking-[0.2em] transition-all duration-500">
+          <p className="md:text-xl text-md tracking-[0.1rem] uppercase transition-all duration-500">
             {initialClient?.eventDate.toDateString()}
           </p>
           <Button
@@ -55,7 +55,7 @@ export default function HeroSection({
                      hover:text-white transition-all duration-300 uppercase tracking-wider
                      px-8 py-6 text-sm"
           >
-            Introduction
+            {initialClient?.description}
           </Button>
         </div>
       </div>
