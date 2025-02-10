@@ -65,6 +65,7 @@ export default function FormSelectInput({
         title: formData.title,
         slug,
         description: formData.description,
+        clientId: ""
       });
 
       if (result.success) {
