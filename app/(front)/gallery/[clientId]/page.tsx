@@ -39,7 +39,7 @@ export default async function GalleryDetail({
 
   return (
     <section className="py-16 bg-gradient-to-b from-amber-50 to-white min-h-screen">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto lg:px-4">
         <div className="mb-16">
           <HeroSection initialClient={fetchedClient} />
         </div>

@@ -43,7 +43,7 @@ export default function HeroSection({
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          <h1 className="text-4xl uppercase md:text-7xl font-light tracking-wide transition-all duration-500">
+          <h1 className="text-3xl uppercase md:text-7xl font-light tracking-wide transition-all duration-500">
             {initialClient?.title}
           </h1>
           <p className="md:text-xl text-md tracking-[0.1rem] uppercase transition-all duration-500">
