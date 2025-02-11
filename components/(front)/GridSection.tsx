@@ -57,42 +57,24 @@ export default function PhotoGallery({
     useState<NodeJS.Timeout | null>(null);
   const [slideshowDelay, setSlideshowDelay] = useState(3000);
 
-  // const categories = [
-  //   {
-  //     id: "all",
-  //     title: "All",
-  //     name: "All",
-  //     photos:
-  //       initialClient.photos?.map((photo) => ({
-  //         src: photo.url,
-  //         alt: photo.caption || "photo",
-  //       })) || [],
-  //     youtubeUrl: initialClient.youtubeUrl || null,
-  //   },
-  //   ...photoCategories.map((category) => ({
-  //     id: category.id,
-  //     title: category.title,
-  //     name: category.title,
-  //     photos: clientPhotos
-  //       .filter((photo) => photo.categoryId === category.id)
-  //       .map((photo) => ({
-  //         src: photo.url,
-  //         alt: photo.description || "photo",
-  //       })),
-  //   })),
-  // ];
   const categories = [
     ...photoCategories.map((category) => ({
       id: category.id,
       title: category.title,
       name: category.title,
-      photos: clientPhotos
-        .filter((photo) => photo.categoryId === category.id)
-        .map((photo) => ({
-          src: photo.url,
-          alt: photo.description || "photo",
-        })),
-      // Show YouTube video only if this is the "highlights" category
+      photos:
+        category.slug === "all"
+          ? clientPhotos.map((photo) => ({
+              // For "all" category, include all photos
+              src: photo.url,
+              alt: photo.description || "photo",
+            }))
+          : clientPhotos // For other categories, filter by categoryId
+              .filter((photo) => photo.categoryId === category.id)
+              .map((photo) => ({
+                src: photo.url,
+                alt: photo.description || "photo",
+              })),
       youtubeUrl: category.slug === "all" ? initialClient.youtubeUrl : null,
     })),
   ];
