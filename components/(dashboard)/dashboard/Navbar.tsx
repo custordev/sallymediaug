@@ -5,13 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Menu, X, Camera, Bell } from "lucide-react";
+import { Menu, X, Bell, Home, AirVent } from "lucide-react";
 
 const navLinks = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Bookings", href: "/dashboard/bookings" },
   { name: "Categories", href: "/dashboard/categories" },
   { name: "Clients", href: "/dashboard/clients" },
+  { name: "Live App", icon: Home, href: "/" },
 ];
 
 export function Navbar() {
@@ -24,8 +25,8 @@ export function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/dashboard">
-                <Camera className="h-8 w-8 text-amber-600" />
+              <Link href="/">
+                <AirVent className="h-8 w-8 text-amber-500" />
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">

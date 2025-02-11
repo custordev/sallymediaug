@@ -41,7 +41,7 @@ export default async function ClientPage({ params }: PageProps) {
   ]);
 
   return (
-    <div className="p-8">
+    <div className="lg:p-8 p-1">
       <ClientEditForm
         categories={categories}
         photoCategories={photoCategories.data}

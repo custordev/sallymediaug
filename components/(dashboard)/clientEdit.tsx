@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -19,17 +20,18 @@ import { Popup } from "./popupcat";
 import { AddEventCategoryForm } from "./AddPhotoscategory";
 import FormSelectInput from "../(forms)/ShadSelectInput";
 import { getPhotoCategories } from "@/actions/photoCategory";
+import PasswordInput from "../(formInputs)/PasswordInput";
 
-interface ExtendedClient extends Client {
+interface ExtendedClient extends Omit<Client, "password"> {
   eventCategories?: PhotoCategory[];
   galleryImages?: string[];
+  password?: string | null;
 }
 
 interface ClientFormProps {
   editingId?: string;
   initialData?: ExtendedClient | null;
   categories: Category[] | null;
-  // eventCategories?: PhotoCategory[] | null // Removed as it's now fetched dynamically
   photoCategories?: PhotoCategory[] | null;
 }
 
@@ -38,6 +40,7 @@ interface FormInputs {
   description: string | null;
   eventDate: string;
   youtubeUrl: string | null;
+  password: string | null;
 }
 
 export default function ClientEditForm({
@@ -50,6 +53,7 @@ export default function ClientEditForm({
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<FormInputs>();
 
@@ -94,6 +98,7 @@ export default function ClientEditForm({
           : ""
       );
       setValue("youtubeUrl", initialData.youtubeUrl || "");
+      setValue("password", initialData.password || "");
       setImageUrl(initialData.imageUrl || "/placeholder.svg");
       setGalleryImages(initialData.galleryImages || []);
     }
@@ -109,7 +114,6 @@ export default function ClientEditForm({
           toast.error("Failed to fetch photo categories");
         }
       } else {
-        // If we're creating a new client, we don't have photo categories yet
         setPhotoCategories([]);
       }
     }
@@ -152,6 +156,8 @@ export default function ClientEditForm({
         imageUrl: imageUrl !== "/placeholder.svg" ? imageUrl : undefined,
         galleryImages,
         slug: generateSlug(data.title),
+        isProtected: !!data.password,
+        password: data.password || null,
       };
 
       if (editingId) {
@@ -223,13 +229,22 @@ export default function ClientEditForm({
                   type="date"
                 />
 
-                <TextInput
-                  register={register}
-                  errors={errors}
-                  label="YouTube URL"
-                  name="youtubeUrl"
-                  placeholder="https://youtube.com/..."
-                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <TextInput
+                    register={register}
+                    errors={errors}
+                    label="YouTube URL"
+                    name="youtubeUrl"
+                    placeholder="https://youtube.com/..."
+                  />
+                  <PasswordInput
+                    register={register}
+                    errors={errors}
+                    label="Password (Optional)"
+                    name="password"
+                    toolTipText="Set a password to protect this client's gallery"
+                  />
+                </div>
 
                 <TextArea
                   register={register}
@@ -311,7 +326,7 @@ export default function ClientEditForm({
       >
         <AddEventCategoryForm
           onSuccess={handlePhotoCategoryAdd}
-          clientId={editingId || ""} // Use editingId or an empty string if not available
+          clientId={editingId || ""}
         />
       </Popup>
     </form>

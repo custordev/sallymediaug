@@ -141,6 +141,8 @@ model Client {
   category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  isProtected Boolean        @default(false)
+  password    String?
 
   @@index([categoryId])
 }

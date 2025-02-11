@@ -35,7 +35,7 @@ export default async function ClientPage({ params }: PageProps) {
   const safePhotoCategories: PhotoCategory[] = PhotoCategories || [];
 
   return (
-    <div className="p-8">
+    <div className="lg:p-8 p-1">
       <ClientEditForm
         categories={safeCategories}
         photoCategories={safePhotoCategories}

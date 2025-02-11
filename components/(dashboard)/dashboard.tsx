@@ -66,8 +66,8 @@ const recentClients = [
 
 export default function Dashboard() {
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-amber-700 mb-6">
+    <div className="p-1 space-y-6">
+      <h1 className="lg:text-3xl text-2xl font-bold text-amber-700 lg:mb-6">
         Photography Dashboard
       </h1>
 
@@ -92,7 +92,7 @@ export default function Dashboard() {
         </Card>
 
         <Card className="bg-gradient-to-br from-amber-600 to-amber-700">
-          <CardContent className="p-6">
+          <CardContent className="lg:p-6 p-2">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-white/80 text-sm">Total Clients</p>

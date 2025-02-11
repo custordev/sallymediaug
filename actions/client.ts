@@ -7,6 +7,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import db from "@/prisma/db";
 import { z } from "zod";
 import type { ClientUpdateData } from "@/types/types";
+import { ReactNode } from "react";
 
 const ClientFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -28,7 +29,8 @@ interface ClientFormData {
   imageUrl?: string;
   youtubeUrl?: string;
   categoryId: string;
-  photos?: string[]; // Array of photo URLs if any initial photos are being added
+  photos?: string[];
+  // Array of photo URLs if any initial photos are being added
 }
 
 // Updated interfaces
@@ -45,6 +47,9 @@ type ApiResponse = {
 };
 // First, let's define the proper types
 interface ExtendedClient {
+  success: any;
+  error: ReactNode;
+  data: any;
   id: string;
   title: string;
   slug: string;
@@ -54,6 +59,8 @@ interface ExtendedClient {
   youtubeUrl: string | null;
   categoryId: string;
   photos: Photo[];
+  password?: string;
+  isProtected: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -118,6 +125,10 @@ export async function getClientById(
       createdAt: client.createdAt,
       // Ensure updatedAt is never null by using current date as fallback
       updatedAt: client.updatedAt || new Date(),
+      isProtected: false,
+      success: undefined,
+      error: undefined,
+      data: undefined,
     };
 
     return extendedClient;
@@ -382,33 +393,35 @@ export async function getAllClients() {
 }
 
 export async function deleteClient(id: string) {
-  noStore()
+  noStore();
 
   try {
     const result = await db.$transaction(async (prisma) => {
       // First, delete all photos associated with the client
-      await prisma.photo.deleteMany({ where: { clientId: id } })
+      await prisma.photo.deleteMany({ where: { clientId: id } });
 
       // Then, delete all photo categories associated with the client
-      await prisma.photoCategory.deleteMany({ where: { clientId: id } })
+      await prisma.photoCategory.deleteMany({ where: { clientId: id } });
 
       // Finally, delete the client
-      const deletedClient = await prisma.client.delete({ where: { id } })
+      const deletedClient = await prisma.client.delete({ where: { id } });
 
-      return deletedClient
-    })
+      return deletedClient;
+    });
 
-    revalidatePath("/dashboard/gallery")
-    return { ok: true, data: result }
+    revalidatePath("/dashboard/gallery");
+    return { ok: true, data: result };
   } catch (error) {
-    console.error("Error deleting client:", error instanceof Error ? error.message : "Unknown error")
+    console.error(
+      "Error deleting client:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
     return {
       ok: false,
       error: error instanceof Error ? error.message : "Failed to delete client",
-    }
+    };
   }
 }
-
 
 export async function updateClientById(id: string, data: ClientUpdateData) {
   noStore();
@@ -480,5 +493,33 @@ export async function getClientsByCategory(categorySlug: string) {
   } catch (error) {
     console.error("Error fetching clients by category:", error);
     return [];
+  }
+}
+
+export async function verifyClientAccess(id: string, password: string): Promise<ApiResponse> {
+  noStore()
+
+  try {
+    const client = await db.client.findUnique({ where: { id } })
+    if (!client) {
+      return { success: false, error: "Client not found", statusCode: 404 }
+    }
+
+    if (!client.isProtected) {
+      return { success: true, statusCode: 200 }
+    }
+
+    if (client.password !== password) {
+      return { success: false, error: "Invalid password", statusCode: 401 }
+    }
+
+    return { success: true, statusCode: 200 }
+  } catch (error) {
+    console.error("Error verifying client access:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      statusCode: 500,
+    }
   }
 }

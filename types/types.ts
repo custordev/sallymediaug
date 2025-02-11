@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PhotoCategory } from "@prisma/client";
 export interface ExtendedClient {
+  photoCategoryId: string;
+  password: string;
+  isProtected: boolean;
   id: string;
   title: string;
   slug: string;
@@ -3737,6 +3740,8 @@ export type CategoryProps = {
 };
 
 export type ClientUpdateData = {
+  password: any;
+  isProtected: any;
   photos: boolean;
   slug: any;
   imageUrl: any;

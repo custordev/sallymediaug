@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: tParams }) {
   }
 
   return (
-    <div className="p-8">
+    <div className="lg:p-8 p-4">
       {category ? (
         <CategoryForm initialData={category} editingId={id} />
       ) : (
