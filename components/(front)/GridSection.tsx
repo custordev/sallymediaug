@@ -47,7 +47,7 @@ export default function PhotoGallery({
   photoCategories,
   clientPhotos,
 }: PhotoGalleryProps) {
-  const [activeCategory, setActiveCategory] = useState("highlights");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [favorites, setFavorites] = useState(new Set<string>());
@@ -62,20 +62,14 @@ export default function PhotoGallery({
       id: category.id,
       title: category.title,
       name: category.title,
-      photos:
-        category.slug === "all"
-          ? clientPhotos.map((photo) => ({
-              // For "all" category, include all photos
-              src: photo.url,
-              alt: photo.description || "photo",
-            }))
-          : clientPhotos // For other categories, filter by categoryId
-              .filter((photo) => photo.categoryId === category.id)
-              .map((photo) => ({
-                src: photo.url,
-                alt: photo.description || "photo",
-              })),
-      youtubeUrl: category.slug === "all" ? initialClient.youtubeUrl : null,
+      photos: clientPhotos
+        .filter((photo) => photo.categoryId === category.id)
+        .map((photo) => ({
+          src: photo.url,
+          alt: photo.description || "photo",
+        })),
+      youtubeUrl:
+        category.slug === "highlights" ? initialClient.youtubeUrl : null,
     })),
   ];
   const currentCategory =
@@ -195,76 +189,6 @@ export default function PhotoGallery({
     },
     [currentCategory]
   );
-
-  // const handleDownload = useCallback(
-  //   (e: React.MouseEvent, src?: string) => {
-  //     e.stopPropagation();
-
-  //     if (!src) {
-  //       currentCategory.photos.forEach((photo) => {
-  //         const link = document.createElement("a");
-  //         link.href = photo.src;
-  //         const filename = photo.src.split("/").pop() || "image";
-  //         link.download = filename;
-  //         document.body.appendChild(link);
-  //         link.click();
-  //         document.body.removeChild(link);
-  //       });
-  //       showAlertMessage("Downloading all photos from this category!");
-  //       return;
-  //     }
-
-  //     const link = document.createElement("a");
-  //     link.href = src;
-  //     const filename = src.split("/").pop() || "image";
-  //     link.download = filename;
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-
-  //     showAlertMessage("Download started!");
-  //   },
-  //   [currentCategory]
-  // );
-
-  // const handleShare = useCallback(
-  //   async (e: React.MouseEvent, src?: string) => {
-  //     e.stopPropagation();
-
-  //     try {
-  //       if (!src) {
-  //         const galleryUrl = window.location.href;
-  //         if (navigator.share) {
-  //           await navigator.share({
-  //             title: `${initialClient.name}'s Photo Gallery`,
-  //             text: `Check out ${initialClient.name}'s photo gallery`,
-  //             url: galleryUrl,
-  //           });
-  //           showAlertMessage("Shared gallery successfully!");
-  //         } else {
-  //           await navigator.clipboard.writeText(galleryUrl);
-  //           showAlertMessage("Gallery link copied to clipboard!");
-  //         }
-  //         return;
-  //       }
-
-  //       if (navigator.share) {
-  //         await navigator.share({
-  //           title: `Photo from ${initialClient.name}'s gallery`,
-  //           text: `Check out this photo from ${initialClient.name}'s gallery`,
-  //           url: src,
-  //         });
-  //         showAlertMessage("Shared successfully!");
-  //       } else {
-  //         await navigator.clipboard.writeText(src);
-  //         showAlertMessage("Link copied to clipboard!");
-  //       }
-  //     } catch (error) {
-  //       showAlertMessage("Error sharing image");
-  //     }
-  //   },
-  //   [initialClient]
-  // );
 
   const handleDownload = useCallback(
     (e: React.MouseEvent, src?: string) => {

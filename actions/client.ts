@@ -161,9 +161,9 @@ export async function createClient(data: ClientFormData): Promise<ApiResponse> {
       // Create a default "All" photo category for the client
       const allCategory = await prisma.photoCategory.create({
         data: {
-          title: "All",
-          slug: "all",
-          description: "All photos for this client",
+          title: "Highlights",
+          slug: "highlights",
+          description: "highlight photos for this client",
           clientId: client.id,
         },
       });
@@ -496,30 +496,34 @@ export async function getClientsByCategory(categorySlug: string) {
   }
 }
 
-export async function verifyClientAccess(id: string, password: string): Promise<ApiResponse> {
-  noStore()
+export async function verifyClientAccess(
+  id: string,
+  password: string
+): Promise<ApiResponse> {
+  noStore();
 
   try {
-    const client = await db.client.findUnique({ where: { id } })
+    const client = await db.client.findUnique({ where: { id } });
     if (!client) {
-      return { success: false, error: "Client not found", statusCode: 404 }
+      return { success: false, error: "Client not found", statusCode: 404 };
     }
 
     if (!client.isProtected) {
-      return { success: true, statusCode: 200 }
+      return { success: true, statusCode: 200 };
     }
 
     if (client.password !== password) {
-      return { success: false, error: "Invalid password", statusCode: 401 }
+      return { success: false, error: "Invalid password", statusCode: 401 };
     }
 
-    return { success: true, statusCode: 200 }
+    return { success: true, statusCode: 200 };
   } catch (error) {
-    console.error("Error verifying client access:", error)
+    console.error("Error verifying client access:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
       statusCode: 500,
-    }
+    };
   }
 }
