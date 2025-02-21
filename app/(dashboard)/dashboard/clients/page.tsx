@@ -49,7 +49,12 @@ export default async function Clients() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <ClientProtectionToggle client={client} />
+                  <ClientProtectionToggle
+                    client={{
+                      ...client,
+                      isProtected: client.isProtected ?? false,
+                    }}
+                  />
                   {client.isProtected ? (
                     <Lock className="h-4 w-4 text-amber-600" />
                   ) : (
