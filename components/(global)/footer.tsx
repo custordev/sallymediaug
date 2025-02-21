@@ -1,14 +1,39 @@
 "use client";
-import React from "react";
+
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import { categories } from "@/types/types";
 import Image from "next/image";
+import { getRandomPhotos } from "@/actions/photos";
 import Link from "next/link";
 import { Instagram, Mail, Phone, X, Youtube } from "lucide-react";
 
+interface CarouselPhoto {
+  url: string;
+  category?: string;
+  client?: string;
+}
+
 export function Footer() {
+  const [carouselPhotos, setCarouselPhotos] = useState<CarouselPhoto[]>([]);
+
+  useEffect(() => {
+    const fetchAndShufflePhotos = async () => {
+      const result = await getRandomPhotos(8);
+      if (result.success) {
+        setCarouselPhotos(result.data || []);
+      }
+    };
+
+    fetchAndShufflePhotos();
+
+    // Set up an interval to refresh photos every 6 hours
+    const intervalId = setInterval(fetchAndShufflePhotos, 6 * 60 * 60 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <footer className="bg-gradient-to-b from-amber-50 to-white text-gray-700 py-16 border-t border-amber-100">
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,19 +52,24 @@ export function Footer() {
               delay: 3000,
               disableOnInteraction: false,
             }}
-            className="h-32"
+            className="h-32 sm:h-40"
           >
-            {categories[0].photos.map((photo, index) => (
+            {carouselPhotos.map((photo, index) => (
               <SwiperSlide key={index}>
-                <div className="group relative h-full overflow-hidden">
+                <div className="group relative h-full overflow-hidden rounded-lg">
                   <Image
                     width={1080}
                     height={1080}
-                    src={photo.src}
-                    alt="Gallery preview"
+                    src={photo.url || "/placeholder.svg"}
+                    alt={photo.category || photo.client || "Gallery preview"}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-black/20 transition-opacity duration-300 group-hover:opacity-0" />
+                  {(photo.category || photo.client) && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 text-center">
+                      {photo.category || photo.client}
+                    </div>
+                  )}
                 </div>
               </SwiperSlide>
             ))}
@@ -65,7 +95,7 @@ export function Footer() {
               className="text-gray-600 hover:text-amber-600 flex items-center justify-center md:justify-start gap-2 transition-colors"
             >
               <Mail size={16} />
-              sallymedia777@gamail.com
+              sallymedia777@gmail.com
             </a>
           </div>
 
@@ -112,7 +142,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 hover:text-amber-600">
+        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 ">
           <p>
             © {new Date().getFullYear()} Sally Media Ug. All rights reserved.
           </p>

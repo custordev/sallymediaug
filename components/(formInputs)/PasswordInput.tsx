@@ -24,7 +24,7 @@ type TextInputProps = {
 };
 export default function PasswordInput({
   register,
-  errors,
+  // errors,
   label,
   type = "text",
   name,
@@ -88,15 +88,14 @@ export default function PasswordInput({
                 message: "Password must be at least 8 characters",
               },
               pattern: {
-                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
                 message:
-                  "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                  "Password must contain at least one uppercase letter, one lowercase letter, one number",
               },
-             
             })}
             className={cn(
-              "block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 text-sm",
-              (errors[name] && "focus:ring-red-500 pl-8") || (icon && "pl-8")
+              "block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 text-sm"
+              // (errors[name] && "focus:ring-red-500 pl-8") || (icon && "pl-8")
             )}
             placeholder={placeholder || label}
           />
@@ -114,9 +113,9 @@ export default function PasswordInput({
             )}
           </button>
         </div>
-        {errors[name] && (
+        {/* {errors[name] && (
           <span className="text-xs text-red-600">{errors[name].message}</span>
-        )}
+        )} */}
       </div>
     </div>
   );

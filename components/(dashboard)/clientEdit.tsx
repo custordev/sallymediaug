@@ -239,10 +239,11 @@ export default function ClientEditForm({
                   />
                   <PasswordInput
                     register={register}
-                    errors={errors}
+                    // errors={errors}
                     label="Password (Optional)"
                     name="password"
                     toolTipText="Set a password to protect this client's gallery"
+                    errors={undefined}
                   />
                 </div>
 

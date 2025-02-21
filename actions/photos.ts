@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -119,6 +120,108 @@ export async function deletePhoto(id: string) {
     return {
       success: false,
       error: "Failed to delete photo",
+    };
+  }
+}
+
+// export async function getRandomPhotos(count: number) {
+//   noStore();
+
+//   try {
+//     const photos = await prisma.photo.findMany({
+//       select: {
+//         url: true,
+//       },
+//       // orderBy: {
+//       //   createdAt: "desc",
+//       // },
+//       take: 50, // Fetch more than we need to allow for randomization
+//     });
+
+//     // Shuffle the photos and take the requested count
+//     const shuffled = photos.sort(() => 0.5 - Math.random());
+//     const selected = shuffled.slice(0, count);
+
+//     return { success: true, data: selected };
+//   } catch (error) {
+//     console.error("Error fetching random photos:", error);
+//     return {
+//       success: false,
+//       error: "Failed to fetch random photos",
+//     };
+//   }
+// }
+
+export async function getRandomPhotos(count: number) {
+  noStore();
+
+  try {
+    // Get all unique category IDs
+    const categories = await prisma.photoCategory.findMany({
+      select: { id: true },
+    });
+
+    // Get all unique client IDs
+    const clients = await prisma.client.findMany({
+      select: { id: true },
+    });
+
+    // Shuffle categories and clients
+    const shuffledCategories = categories.sort(() => 0.5 - Math.random());
+    const shuffledClients = clients.sort(() => 0.5 - Math.random());
+
+    // Select a subset of categories and clients
+    const selectedCategories = shuffledCategories.slice(
+      0,
+      Math.min(count, categories.length)
+    );
+    const selectedClients = shuffledClients.slice(
+      0,
+      Math.min(count, clients.length)
+    );
+
+    // Fetch one random photo for each selected category and client
+    const photoPromises = [
+      ...selectedCategories.map((category) =>
+        prisma.photo.findFirst({
+          where: { categoryId: category.id },
+          select: { url: true, category: { select: { id: true } } },
+          // orderBy: { createdAt: "desc" },
+        })
+      ),
+      ...selectedClients.map((client) =>
+        prisma.photo.findFirst({
+          where: { clientId: client.id },
+          select: { url: true, client: { select: { title: true } } },
+          // orderBy: { createdAt: "desc" },
+        })
+      ),
+    ];
+
+    const photos = await Promise.all(photoPromises);
+
+    // Filter out any null results and shuffle the remaining photos
+    const validPhotos = photos.filter((photo) => photo !== null);
+    const shuffledPhotos = validPhotos.sort(() => 0.5 - Math.random());
+
+    // Take the requested count of photos
+    const selected = shuffledPhotos.slice(0, count);
+
+    return {
+      success: true,
+      data: selected.map((photo) => ({
+        url: photo!.url,
+        category: (photo as any).category
+          ? (photo as any).category.name
+          : undefined,
+        client: "client" in photo! ? photo!.client.title : undefined,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching random photos:", error);
+    return {
+      success: false,
+      error: "Failed to fetch random photos",
     };
   }
 }

@@ -9,7 +9,7 @@ export function Hero() {
         <Image
           width={1080}
           height={1080}
-          src="/denis-prossy/highlights/N77A8605.jpg"
+          src="/14.jpg"
           alt="Hero"
           className="w-full h-full object-cover"
         />

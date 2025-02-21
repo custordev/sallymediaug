@@ -77,54 +77,6 @@ model Category {
 }
 
 
-// model Client {
-//   id          String         @id @default(auto()) @map("_id") @db.ObjectId
-//   title       String
-//   slug        String         @unique
-//   description String?
-//   eventDate   DateTime       @default(now())
-//   imageUrl    String?
-//   youtubeUrl  String?
-//   photos      Photo[]
-//   categories  PhotoCategory[]
-//   categoryId  String         @db.ObjectId
-//   category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-//   createdAt   DateTime       @default(now())
-//   updatedAt   DateTime       @updatedAt
-
-//   @@index([categoryId])
-// }
-
-// model PhotoCategory {
-//   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-//   title       String   
-//   slug        String   
-//   description String?
-//   photos      Photo[]
-//   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-//   clientId    String   @db.ObjectId
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-
-//   @@unique([title, clientId])
-//   @@unique([slug, clientId])
-//   @@index([clientId])
-// }
-
-// model Photo {
-//   id          String        @id @default(auto()) @map("_id") @db.ObjectId
-//   url         String
-//   description String?
-//   clientId    String        @db.ObjectId
-//   client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-//   categoryId  String        @db.ObjectId
-//   category    PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-//   createdAt   DateTime      @default(now())
-//   updatedAt   DateTime      @updatedAt
-
-//   @@index([clientId])
-//   @@index([categoryId])
-// }
 
 
 model Client {
@@ -141,7 +93,7 @@ model Client {
   category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  isProtected Boolean        @default(false)
+  isProtected Boolean?        @default(false)
   password    String?
 
   @@index([categoryId])

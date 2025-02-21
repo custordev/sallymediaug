@@ -6,12 +6,19 @@ import { Camera, Clock, Award, Heart, Users } from "lucide-react";
 import { Carousel } from "../ui/carousel";
 
 const images = [
+  { src: "/carousel/7.jpg" },
+  { src: "/carousel/6.jpg" },
+  { src: "/carousel/9.jpg" },
   { src: "/denis-prossy/highlights/N77A8605.jpg" },
-  { src: "/denis-prossy/highlights/N77A8619.jpg" },
+  { src: "/carousel/8.jpg" },
   { src: "/denis-prossy/highlights/N77A8623.jpg" },
+  { src: "/carousel/2.jpg" },
   { src: "/denis-prossy/highlights/N77A8645.jpg" },
+  { src: "/carousel/5.jpg" },
+
   { src: "/denis-prossy/highlights/N77A8646.jpg" },
-  { src: "/denis-prossy/highlights/N77A9197.jpg" },
+  { src: "/carousel/3.jpg" },
+  { src: "/carousel/4.jpg" },
 ];
 
 const stats = [

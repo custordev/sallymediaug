@@ -28,7 +28,7 @@ export async function getPhotoCategories(
 
     const categories = await db.photoCategory.findMany({
       where: { clientId },
-      orderBy: { title: "asc" },
+      // orderBy: { title: "asc" },
     });
 
     return {

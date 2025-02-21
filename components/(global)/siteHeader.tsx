@@ -106,46 +106,107 @@ export default function SiteHeader({
     setIsSheetOpen(false);
   };
 
-  // Auth button component
-  const AuthButton = () => {
-    if (session) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={session.user?.image || ""}
-                  alt={session.user?.name || ""}
-                />
-                <AvatarFallback>
-                  {session.user?.name?.[0] || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <span className="hidden md:inline">{session.user?.name}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {(session.user?.role === "admin" ||
-              session.user?.role === "service_provider") && (
-              <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-                Dashboard
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={() => signOut()}>
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
-    return null;
-  };
+  // // Auth button component
+  // const AuthButton = () => {
+  //   if (session) {
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button
+  //             variant="ghost"
+  //             size="sm"
+  //             className="flex items-center gap-2"
+  //           >
+  //             <Avatar className="h-8 w-8">
+  //               <AvatarImage
+  //                 src={session.user?.image || ""}
+  //                 alt={session.user?.name || ""}
+  //               />
+  //               <AvatarFallback>
+  //                 {session.user?.name?.[0] || "U"}
+  //               </AvatarFallback>
+  //             </Avatar>
+  //             <span className="hidden md:inline">{session.user?.name}</span>
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           {(session.user?.role === "admin" ||
+  //             session.user?.role === "service_provider") && (
+  //             <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+  //               Dashboard
+  //             </DropdownMenuItem>
+  //           )}
+  //           <DropdownMenuItem onClick={() => signOut()}>
+  //             Log out
+  //           </DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     );
+  //   }
+  //   return null;
+  // };
+  // const AuthButton = () => {
+  //   if (!session) {
+  //     return null;
+  //   }
 
+  //   const isAdminOrProvider =
+  //     session.user?.role === "admin" ||
+  //     session.user?.role === "service_provider";
+
+  //   return (
+  //     <DropdownMenu>
+  //       <DropdownMenuTrigger asChild>
+  //         <Button variant="ghost" size="sm" className="flex items-center gap-2">
+  //           <Avatar className="h-8 w-8">
+  //             <AvatarImage
+  //               src={session.user?.image || ""}
+  //               alt={session.user?.name || ""}
+  //             />
+  //             <AvatarFallback>{session.user?.name?.[0] || "U"}</AvatarFallback>
+  //           </Avatar>
+  //           <span className="hidden md:inline">{session.user?.name}</span>
+  //         </Button>
+  //       </DropdownMenuTrigger>
+  //       <DropdownMenuContent align="end">
+  //         {isAdminOrProvider && (
+  //           <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+  //             Dashboard
+  //           </DropdownMenuItem>
+  //         )}
+  //         <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>
+  //       </DropdownMenuContent>
+  //     </DropdownMenu>
+  //   );
+  // };
+  const AuthButton = () => {
+    if (!session) {
+      return null; // Return nothing if not logged in
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={session.user?.image || ""}
+                alt={session.user?.name || ""}
+              />
+              <AvatarFallback>{session.user?.name?.[0] || "U"}</AvatarFallback>
+            </Avatar>
+            <span className="hidden md:inline">{session.user?.name}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+            Dashboard
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-amber-50 to-white border-b border-amber-100">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
