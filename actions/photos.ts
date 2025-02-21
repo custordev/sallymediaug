@@ -91,7 +91,7 @@ export async function getClientPhotos(clientId: string, categoryId?: string) {
       include: {
         category: true,
       },
-      orderBy: { createdAt: "desc" },
+      // orderBy: { createdAt: "desc" },
     });
 
     return { success: true, data: photos };
