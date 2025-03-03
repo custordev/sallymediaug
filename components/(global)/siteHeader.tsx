@@ -51,16 +51,12 @@ const baseMenuItems = [
     hasChildren: true,
   },
   {
-    title: "About",
-    href: "/#about",
-  },
-  {
-    title: "Services",
-    href: "/#services",
+    title: "SallyConcepts",
+    href: "/sallyConcepts",
   },
   {
     title: "Contact",
-    href: "/#contact",
+    href: "/contact",
   },
 ];
 
@@ -106,79 +102,6 @@ export default function SiteHeader({
     setIsSheetOpen(false);
   };
 
-  // // Auth button component
-  // const AuthButton = () => {
-  //   if (session) {
-  //     return (
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button
-  //             variant="ghost"
-  //             size="sm"
-  //             className="flex items-center gap-2"
-  //           >
-  //             <Avatar className="h-8 w-8">
-  //               <AvatarImage
-  //                 src={session.user?.image || ""}
-  //                 alt={session.user?.name || ""}
-  //               />
-  //               <AvatarFallback>
-  //                 {session.user?.name?.[0] || "U"}
-  //               </AvatarFallback>
-  //             </Avatar>
-  //             <span className="hidden md:inline">{session.user?.name}</span>
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align="end">
-  //           {(session.user?.role === "admin" ||
-  //             session.user?.role === "service_provider") && (
-  //             <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-  //               Dashboard
-  //             </DropdownMenuItem>
-  //           )}
-  //           <DropdownMenuItem onClick={() => signOut()}>
-  //             Log out
-  //           </DropdownMenuItem>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     );
-  //   }
-  //   return null;
-  // };
-  // const AuthButton = () => {
-  //   if (!session) {
-  //     return null;
-  //   }
-
-  //   const isAdminOrProvider =
-  //     session.user?.role === "admin" ||
-  //     session.user?.role === "service_provider";
-
-  //   return (
-  //     <DropdownMenu>
-  //       <DropdownMenuTrigger asChild>
-  //         <Button variant="ghost" size="sm" className="flex items-center gap-2">
-  //           <Avatar className="h-8 w-8">
-  //             <AvatarImage
-  //               src={session.user?.image || ""}
-  //               alt={session.user?.name || ""}
-  //             />
-  //             <AvatarFallback>{session.user?.name?.[0] || "U"}</AvatarFallback>
-  //           </Avatar>
-  //           <span className="hidden md:inline">{session.user?.name}</span>
-  //         </Button>
-  //       </DropdownMenuTrigger>
-  //       <DropdownMenuContent align="end">
-  //         {isAdminOrProvider && (
-  //           <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-  //             Dashboard
-  //           </DropdownMenuItem>
-  //         )}
-  //         <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>
-  //       </DropdownMenuContent>
-  //     </DropdownMenu>
-  //   );
-  // };
   const AuthButton = () => {
     if (!session) {
       return null; // Return nothing if not logged in

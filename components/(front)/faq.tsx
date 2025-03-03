@@ -6,30 +6,25 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 const faqs = [
   {
-    question: "What types of photography do you offer?",
-    answer:
-      "We specialize in wedding photography, portrait sessions, and event coverage. Our team is experienced in capturing a wide range of occasions, from intimate gatherings to large-scale events.",
+    question: "What services do you offer?",
+    answer: "We offer a wide range of photography services including weddings, kwanjula ceremonies, studio sessions (Sally Concepts), corporate events, and personal photoshoots."
   },
   {
-    question: "How far in advance should I book your services?",
-    answer:
-      "We recommend booking as early as possible, especially for weddings and popular dates. Typically, 6-12 months in advance is ideal for weddings, while 2-4 weeks is sufficient for portrait sessions.",
+    question: "How far in advance should I book?",
+    answer: "For weddings and major events, we recommend booking 3-6 months in advance. For studio sessions and smaller events, 2-4 weeks notice is usually sufficient."
   },
   {
-    question: "Do you offer photo editing services?",
-    answer:
-      "Yes, all of our packages include basic editing and color correction. We also offer advanced retouching services for an additional fee.",
+    question: "Do you travel for photoshoots?",
+    answer: "Yes, we are available for travel both locally and internationally. Travel fees may apply depending on the location."
   },
   {
-    question: "Can I get both digital files and printed photos?",
-    answer:
-      "We offer packages that include both digital files and printed photos. We can also create custom albums and wall art from your favorite images.",
+    question: "How long until I receive my photos?",
+    answer: "For weddings and major events, delivery time is typically 2-3 weeks. For studio sessions and smaller events, you can expect your photos within 1-2 weeks."
   },
   {
-    question: "What is your cancellation policy?",
-    answer:
-      "Our cancellation policy varies depending on the type of service and how far in advance you cancel. Please refer to your contract for specific details, or contact us for more information.",
-  },
+    question: "What is Sally Concepts?",
+    answer: "Sally Concepts is our premium studio photography service offering creative, high-quality portrait sessions in a controlled environment with professional lighting and backdrops."
+  }
 ];
 
 const FAQ = () => {

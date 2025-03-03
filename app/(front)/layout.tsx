@@ -3,7 +3,7 @@ import { Geist, Azeret_Mono as Geist_Mono } from "next/font/google";
 import NavbarV1 from "@/components/(global)/siteHeader";
 import { Footer } from "@/components/(global)/footer";
 import { getAllCategories } from "@/actions/categories";
-import type React from "react"; // Import React
+import React from "react"; // Import React
 // import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({

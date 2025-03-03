@@ -1,44 +1,41 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { useEffect, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
-import "swiper/css";
-import Image from "next/image";
-import { getRandomPhotos } from "@/actions/photos";
+// import "swiper/css";
+// import Image from "next/image";
+// import { getRandomPhotos } from "@/actions/photos";
 import Link from "next/link";
 import { Instagram, Mail, Phone, X, Youtube } from "lucide-react";
 
-interface CarouselPhoto {
-  url: string;
-  category?: string;
-  client?: string;
-}
+// interface CarouselPhoto {
+//   url: string;
+//   category?: string;
+//   client?: string;
+// }
 
 export function Footer() {
-  const [carouselPhotos, setCarouselPhotos] = useState<CarouselPhoto[]>([]);
+  // const [carouselPhotos, setCarouselPhotos] = useState<CarouselPhoto[]>([]);
 
-  useEffect(() => {
-    const fetchAndShufflePhotos = async () => {
-      const result = await getRandomPhotos(8);
-      if (result.success) {
-        setCarouselPhotos(result.data || []);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAndShufflePhotos = async () => {
+  //     const result = await getRandomPhotos(8);
+  //     if (result.success) {
+  //       setCarouselPhotos(result.data || []);
+  //     }
+  //   };
 
-    fetchAndShufflePhotos();
+  //   fetchAndShufflePhotos();
 
-    // Set up an interval to refresh photos every 6 hours
-    const intervalId = setInterval(fetchAndShufflePhotos, 6 * 60 * 60 * 1000);
+  //   // Set up an interval to refresh photos every 6 hours
+  //   const intervalId = setInterval(fetchAndShufflePhotos, 6 * 60 * 60 * 1000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   return (
     <footer className="bg-gradient-to-b from-amber-50 to-white text-gray-700 py-16 border-t border-amber-100">
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Image carousel */}
-        <div className="mb-16 overflow-hidden">
+        {/* <div className="mb-16 overflow-hidden">
           <Swiper
             modules={[Autoplay]}
             spaceBetween={8}
@@ -74,7 +71,7 @@ export function Footer() {
               </SwiperSlide>
             ))}
           </Swiper>
-        </div>
+        </div> */}
 
         <div className="text-center mb-12  text-amber-700">
           <h2 className="text-4xl font-bold mb-4">
