@@ -356,7 +356,7 @@ export default function Gallery({ clients, categories = [] }: GalleryProps) {
               Concepts
             </p>
             <a
-               href="https://wa.me/message/CLAOT4PPP6VDO1"
+              href="https://wa.me/256709717440"
               className="inline-block bg-black text-white px-10 py-4 rounded-full font-medium hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
             >
               Book Your Session Now
