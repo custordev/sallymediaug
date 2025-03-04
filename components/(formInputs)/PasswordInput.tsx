@@ -82,16 +82,16 @@ export default function PasswordInput({
             id={name}
             type={passType}
             {...register(name, {
-              required: true,
-              minLength: {
-                value: 8,
-                message: "Password must be at least 8 characters",
-              },
-              pattern: {
-                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                message:
-                  "Password must contain at least one uppercase letter, one lowercase letter, one number",
-              },
+              // required: true,
+              // minLength: {
+              //   value: 8,
+              //   message: "Password must be at least 8 characters",
+              // },
+              // pattern: {
+              //   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+              //   message:
+              //     "Password must contain at least one uppercase letter, one lowercase letter, one number",
+              // },
             })}
             className={cn(
               "block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 text-sm"

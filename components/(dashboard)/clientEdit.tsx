@@ -296,7 +296,7 @@ export default function ClientEditForm({
         <div className="lg:col-span-4">
           <div className="grid gap-6">
             <ImageInput
-              title="Client Featured Image"
+              title="Client Cover Image"
               imageUrl={imageUrl}
               setImageUrl={setImageUrl}
               endpoint="clientImage"
