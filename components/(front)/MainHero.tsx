@@ -3,8 +3,18 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 export default function Hero() {
+  // Add state to track if component is mounted (client-side)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state once component mounts on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex flex-col justify-between overflow-hidden">
       {/* Background Image with Parallax Effect */}
@@ -35,7 +45,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-xl  md:text-5xl font-bold text-white mt-8 mb-4 sm:mb-6 leading-normal px-2"
+              className="text-xl md:text-5xl font-bold text-white mt-8 mb-4 sm:mb-6 leading-normal px-2"
             >
               Let&rsquo;s make your
               <span className="text-amber-400"> moments timeless</span>
@@ -99,27 +109,26 @@ export default function Hero() {
                 transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
                 whileHover={{ scale: 1.05, zIndex: 10 }}
                 className={`relative overflow-hidden rounded-lg shadow-lg ${
-                  // Show only 2 images per row on mobile, making them larger
-                  index < 4 ||
-                  (index >= 4 && index < 4 && window.innerWidth >= 640) ||
-                  window.innerWidth >= 768
+                  // Use CSS classes for responsive visibility instead of window.innerWidth
+                  index < 4
                     ? "block"
-                    : "hidden sm:block md:block"
+                    : index < 4
+                      ? "hidden sm:block"
+                      : "hidden md:block"
                 }`}
-                style={{
-                  // Make images taller on mobile
-                  aspectRatio: window.innerWidth < 640 ? "1/1.2" : "1/1",
-                }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Image
-                  src={src || "/placeholder.svg"}
-                  alt={`Featured Photography ${index + 1}`}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
-                  className="object-cover"
-                  priority={index < 4}
-                />
+                {/* Use CSS classes for aspect ratio instead of inline styles with window.innerWidth */}
+                <div className="aspect-[1/1.2] sm:aspect-square w-full h-full relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Image
+                    src={src || "/placeholder.svg"}
+                    alt={`Featured Photography ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
+                    className="object-cover"
+                    priority={index < 4}
+                  />
+                </div>
               </motion.div>
             ))}
           </div>
