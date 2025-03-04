@@ -34,7 +34,7 @@ export default function HeroSection({
       </div>
 
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/10" />
 
       {/* Text content */}
       <div className="absolute mt-[20rem] inset-0 flex flex-col items-center justify-center text-white text-center z-20">
