@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export default function Hero() {
-  // Add state to track if component is mounted (client-side)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMounted, setIsMounted] = useState(false);
 
