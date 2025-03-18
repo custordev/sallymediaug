@@ -64,7 +64,7 @@
     "swiper": "^11.2.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "uploadthing": "^7.4.4",
+    "uploadthing": "^7.5.2",
     "xlsx": "^0.18.5",
     "yet-another-react-lightbox": "^3.21.7",
     "zod": "^3.24.1"

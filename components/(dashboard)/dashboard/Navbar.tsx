@@ -9,7 +9,6 @@ import { Menu, X, Bell, Home, AirVent } from "lucide-react";
 
 const navLinks = [
   { name: "Dashboard", href: "/dashboard" },
-  { name: "Bookings", href: "/dashboard/bookings" },
   { name: "Categories", href: "/dashboard/categories" },
   { name: "Clients", href: "/dashboard/clients" },
   { name: "Live App", icon: Home, href: "/" },
