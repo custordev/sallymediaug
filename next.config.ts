@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
     bodyParser: false,
   },
   images: {
+    domains: [
+      "uploadthing.com",
+      "utfs.io", // UploadThing's file storage domain
+    ],
     remotePatterns: [
       {
         protocol: "https",
