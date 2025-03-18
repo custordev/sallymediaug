@@ -1,7 +1,7 @@
 "use server";
 
 import { UserProps } from "@/types/types";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import db from "@/prisma/db";
 export async function createUser(data: UserProps) {
   const { email, password, firstName, lastName, name, phone, image } = data;

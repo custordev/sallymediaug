@@ -124,33 +124,6 @@ export async function deletePhoto(id: string) {
   }
 }
 
-// export async function getRandomPhotos(count: number) {
-//   noStore();
-
-//   try {
-//     const photos = await prisma.photo.findMany({
-//       select: {
-//         url: true,
-//       },
-//       // orderBy: {
-//       //   createdAt: "desc",
-//       // },
-//       take: 50, // Fetch more than we need to allow for randomization
-//     });
-
-//     // Shuffle the photos and take the requested count
-//     const shuffled = photos.sort(() => 0.5 - Math.random());
-//     const selected = shuffled.slice(0, count);
-
-//     return { success: true, data: selected };
-//   } catch (error) {
-//     console.error("Error fetching random photos:", error);
-//     return {
-//       success: false,
-//       error: "Failed to fetch random photos",
-//     };
-//   }
-// }
 
 export async function getRandomPhotos(count: number) {
   noStore();
